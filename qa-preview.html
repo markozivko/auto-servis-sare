@@ -1,7 +1,8 @@
 <!doctype html>
 <html lang="hr">
   <meta charset="utf-8" />
-  <title>Šare — provjera responzivnosti</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Šare — provjera hrvatske i engleske stranice</title>
   <style>
     body {
       margin: 24px;
@@ -16,9 +17,15 @@
       margin: 18px 0;
       flex-wrap: wrap;
     }
-    button {
+    button,
+    select {
       padding: 12px 18px;
+      font: inherit;
       cursor: pointer;
+    }
+    button:disabled,
+    select:disabled {
+      cursor: wait;
     }
     iframe {
       border: 0;
@@ -32,39 +39,153 @@
       line-height: 1.7;
     }
   </style>
-  <h1>Lokalna provjera prikaza</h1>
+  <h1>Lokalna provjera oba jezika</h1>
   <p>
     Stvarna stranica unutar mobilne, tabletne ili desktop širine. Testni podaci
-    ne šalju se servisu.
+    ne šalju se servisu; alat ne otvara e-mail aplikaciju niti mijenja
+    međuspremnik.
   </p>
-  <pre id="results" role="status">Provjeravam širine i resurse…</pre>
   <div class="toolbar">
-    <button data-width="320">320 px</button
-    ><button data-width="390">390 px</button
-    ><button data-width="768">768 px</button
-    ><button data-width="1440">1440 px</button
-    ><button id="check-form">Provjeri obrazac bez slanja</button>
+    <label for="language">Jezik pregleda</label>
+    <select id="language">
+      <option value="hr">HR — Hrvatski</option>
+      <option value="en">EN — English</option>
+    </select>
+    <button id="check-all">Provjeri oba jezika i obrasce</button>
+    <button id="check-form">Provjeri trenutačni obrazac</button>
+    <button data-width="320">320 px</button>
+    <button data-width="390">390 px</button>
+    <button data-width="768">768 px</button>
+    <button data-width="1440">1440 px</button>
   </div>
+  <p id="status" role="status">Učitavanje hrvatske stranice…</p>
+  <details>
+    <summary>Detaljni rezultati po jezicima</summary>
+    <pre id="results" aria-label="Rezultati provjere po jezicima"></pre>
+  </details>
   <iframe
     id="preview"
-    src="index.html"
-    title="Pregled stranice Šare"
+    title="Pregled stranice Šare na hrvatskom ili engleskom"
     style="width: 390px"
   ></iframe>
   <script>
     const preview = document.querySelector("#preview");
     const output = document.querySelector("#results");
+    const status = document.querySelector("#status");
+    const language = document.querySelector("#language");
+    const pages = { hr: "index.html", en: "en/index.html" };
+    const labels = { hr: "HR — Hrvatski", en: "EN — English" };
+    const results = { hr: [], en: [] };
+    const widths = [320, 375, 390, 768, 1000, 1024, 1440, 1920];
+    const serviceValues = [
+      "mechanics",
+      "diagnostics",
+      "electrics",
+      "tyres",
+      "air-conditioning",
+      "inspection",
+      "other",
+    ];
+    let busy = false;
     const frameReady = () => new Promise((resolve) => setTimeout(resolve, 100));
-    preview.addEventListener("load", async () => {
+
+    preview.addEventListener("load", () => {
+      const lang = preview.contentDocument?.documentElement.lang;
+      if (pages[lang]) language.value = lang;
+    });
+
+    function renderResults() {
+      output.textContent = Object.keys(pages)
+        .map(
+          (lang) =>
+            labels[lang] +
+            "\n" +
+            (results[lang].join("\n") || "Još nije provjereno."),
+        )
+        .join("\n\n");
+    }
+
+    function record(lang, pass, description) {
+      results[lang].push(`${pass ? "PASS" : "FAIL"} ${description}`);
+      renderResults();
+    }
+
+    async function runChecks(action) {
+      if (busy) return;
+      busy = true;
+      document
+        .querySelectorAll(".toolbar button, .toolbar select")
+        .forEach((control) => {
+          control.disabled = true;
+        });
+      try {
+        await action();
+        const summary = Object.keys(pages).map((lang) => {
+          const passes = results[lang].filter((line) =>
+            line.startsWith("PASS"),
+          ).length;
+          const failures = results[lang].filter((line) =>
+            line.startsWith("FAIL"),
+          );
+          return (
+            `${lang.toUpperCase()}: ${passes} PASS, ${failures.length} FAIL` +
+            (failures.length ? ` (${failures.join("; ")})` : "")
+          );
+        });
+        status.textContent = "Provjera je završena. " + summary.join(" · ");
+      } catch (error) {
+        status.textContent =
+          "Provjera se nije mogla dovršiti: " + error.message;
+      } finally {
+        busy = false;
+        document
+          .querySelectorAll(".toolbar button, .toolbar select")
+          .forEach((control) => {
+            control.disabled = false;
+          });
+      }
+    }
+
+    async function loadPage(lang) {
+      language.value = lang;
+      status.textContent = "Učitavanje: " + labels[lang];
+      await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          preview.onload = null;
+          reject(
+            new Error(
+              "Učitavanje traje predugo. Provjerite lokalni poslužitelj.",
+            ),
+          );
+        }, 20000);
+        preview.onload = () => {
+          clearTimeout(timeout);
+          preview.onload = null;
+          resolve();
+        };
+        preview.src = pages[lang];
+      });
       const doc = preview.contentDocument;
+      if (!doc.querySelector("#booking-form")) {
+        throw new Error("Stranica nije dostupna: " + pages[lang]);
+      }
       await doc.fonts.ready;
-      const results = [];
-      for (const width of [320, 375, 390, 768, 1000, 1024, 1440, 1920]) {
+      return doc;
+    }
+
+    async function checkResponsive(lang, doc) {
+      status.textContent = "Provjera prikaza: " + labels[lang];
+      record(
+        lang,
+        doc.documentElement.lang === lang,
+        "oznaka jezika dokumenta",
+      );
+      for (const width of widths) {
         preview.style.width = width + "px";
         await frameReady();
         const actual = doc.documentElement.clientWidth;
         const overflow = doc.documentElement.scrollWidth > actual;
-        const bad = [...doc.querySelectorAll("main *, header *, footer *")]
+        const outside = [...doc.querySelectorAll("main *, header *, footer *")]
           .filter((el) => {
             const r = el.getBoundingClientRect();
             return (
@@ -75,68 +196,194 @@
           })
           .map((el) => el.tagName + "." + el.className)
           .slice(0, 6);
-        results.push(
-          `${width}px: ${overflow ? "FAIL horizontal overflow" : "PASS bez horizontalnog prelijevanja"}${bad.length ? " | pregledati: " + bad.join(", ") : ""}`,
+        record(
+          lang,
+          !overflow,
+          `${width}px bez horizontalnog prelijevanja` +
+            (outside.length ? " | pregledati: " + outside.join(", ") : ""),
         );
       }
-      const broken = [...doc.images].filter(
-        (img) => img.complete && !img.naturalWidth,
+      const images = [...doc.images];
+      // Explicit loading also checks images outside the iframe's lazy-load area.
+      images.forEach((img) => {
+        img.loading = "eager";
+      });
+      await Promise.all(images.map((img) => img.decode().catch(() => {})));
+      record(
+        lang,
+        images.every((img) => img.complete && img.naturalWidth),
+        "sve slike učitane",
       );
-      results.push("Slike: " + (broken.length ? "FAIL" : "PASS"));
-      results.push(
-        "Fontovi: " +
-          (doc.fonts.check('700 16px "Barlow Condensed"') &&
-          doc.fonts.check("400 16px Manrope")
-            ? "PASS"
-            : "FAIL"),
+      record(
+        lang,
+        doc.fonts.check('700 16px "Barlow Condensed"') &&
+          doc.fonts.check("400 16px Manrope"),
+        "lokalni fontovi učitani",
       );
-      output.textContent = results.join("\n");
       preview.style.width = "390px";
       preview.contentWindow.scrollTo(0, 0);
-    });
-    document
-      .querySelectorAll("[data-width]")
-      .forEach((button) =>
-        button.addEventListener(
-          "click",
-          () => (preview.style.width = button.dataset.width + "px"),
-        ),
-      );
-    document.querySelector("#check-form").addEventListener("click", () => {
-      const doc = preview.contentDocument;
+    }
+
+    function checkForm(lang, doc) {
+      status.textContent = "Provjera obrasca: " + labels[lang];
       const form = doc.querySelector("#booking-form");
-      doc.querySelector('[data-booking][data-service="Klima"]').click();
-      const selected = form.elements.service.value === "Klima";
-      form.elements.name.value = "  Test Korisnik  ";
-      form.elements.email.value = "\u00a0test@example.com\u00a0";
-      form.elements.vehicle.value = "Opel Astra";
-      form.elements.message.value = "Provjera prikaza poruke: čćžšđ & upit?";
-      form.requestSubmit();
-      const link = doc.querySelector("#email-draft").getAttribute("href");
-      const pass =
-        !doc.querySelector("#booking-result").hidden &&
-        selected &&
-        decodeURIComponent(link).includes("čćžšđ & upit?") &&
-        form.elements.name.value === "Test Korisnik";
-      output.textContent +=
-        "\nObrazac: " +
-        (pass
-          ? "PASS odabir usluge, trim, hrvatski znakovi, pregled i mailto nacrt"
-          : "FAIL");
-      doc.querySelector("#edit-inquiry").click();
-      output.textContent +=
-        "\nUređivanje nacrta: " +
-        (!form.hidden && form.elements.vehicle.value === "Opel Astra"
-          ? "PASS"
-          : "FAIL");
-      form.elements.message.value = "   ";
-      form.requestSubmit();
-      output.textContent +=
-        "\nPrazna poruka: " +
-        (!form.hidden && !form.checkValidity() ? "PASS odbijena" : "FAIL");
-      form.reset();
-      [...form.elements].forEach((el) => el.setCustomValidity?.(""));
-      doc.querySelector("#booking-dialog").close();
+      const dialog = doc.querySelector("#booking-dialog");
+      const result = doc.querySelector("#booking-result");
+      const field = (name) => form.elements.namedItem(name);
+      const message =
+        "Molim provjeru vozila: čćžšđ & upit?\nPlease retain my original wording.";
+      const requiredLanguage =
+        lang === "hr"
+          ? /unesite|odaberite|opišite/i
+          : /please|enter|select|choose|describe/i;
+      const invalidEmailLanguage =
+        lang === "hr" ? /ispravn.*e.?mail|valjan.*e.?mail/i : /valid.*e.?mail/i;
+      const subjectLanguage =
+        lang === "hr"
+          ? /upit za servis/i
+          : /(?:service|repair).*(?:enquiry|inquiry)|(?:enquiry|inquiry).*service/i;
+      const bodyLanguage = lang === "hr" ? /poštovani/i : /dear|hello/i;
+      const set = (name, value) => {
+        field(name).value = value;
+        field(name).dispatchEvent(
+          new preview.contentWindow.Event("input", { bubbles: true }),
+        );
+      };
+      const fill = () => {
+        set("name", "  Test Korisnik  ");
+        set("email", "\u00a0test@example.com\u00a0");
+        set("phone", "+385 99 123 4567");
+        set("vehicle", "Opel Astra");
+        set("message", message);
+      };
+      const edit = () => doc.querySelector("#edit-inquiry").click();
+      try {
+        doc.querySelector("[data-booking]").click();
+        form.reset();
+        [...form.elements].forEach((el) => el.setCustomValidity?.(""));
+        form.requestSubmit();
+        for (const name of ["name", "email", "service", "message"]) {
+          record(
+            lang,
+            !field(name).validity.valid &&
+              requiredLanguage.test(field(name).validationMessage),
+            `obavezno polje ${name}: poruka na odabranom jeziku`,
+          );
+        }
+        fill();
+        set("service", "mechanics");
+        set("email", "nije-adresa");
+        form.requestSubmit();
+        record(
+          lang,
+          !form.hidden &&
+            result.hidden &&
+            !field("email").validity.valid &&
+            invalidEmailLanguage.test(field("email").validationMessage),
+          "neispravna e-mail adresa odbijena uz prevedenu poruku",
+        );
+
+        for (const service of serviceValues) {
+          const trigger = doc.querySelector(
+            `[data-booking][data-service="${service}"]`,
+          );
+          if (!trigger) {
+            record(lang, false, "nedostaje odabir usluge: " + service);
+            continue;
+          }
+          trigger.click();
+          record(
+            lang,
+            field("service").value === service,
+            "odabir usluge: " + service,
+          );
+          fill();
+          const serviceLabel = field("service")
+            .selectedOptions[0].textContent.trim()
+            .replace(/\s+/g, " ");
+          form.requestSubmit();
+          const href =
+            doc.querySelector("#email-draft").getAttribute("href") || "";
+          const query = new URLSearchParams(href.split("?")[1] || "");
+          const body = query.get("body") || "";
+          const subject = query.get("subject") || "";
+          record(
+            lang,
+            form.hidden &&
+              !result.hidden &&
+              href.startsWith("mailto:auto-servis@opel-sare.hr?") &&
+              subjectLanguage.test(subject) &&
+              bodyLanguage.test(body) &&
+              subject.includes(serviceLabel) &&
+              body.includes(serviceLabel) &&
+              subject.includes("Opel Astra") &&
+              body.includes(message) &&
+              body.includes("test@example.com") &&
+              body.includes("+385 99 123 4567") &&
+              body === doc.querySelector("#inquiry-preview").value &&
+              field("name").value === "Test Korisnik",
+            "prevedeni predmet i nacrt, izvorni unos i primatelj: " + service,
+          );
+          edit();
+        }
+        record(
+          lang,
+          !form.hidden &&
+            result.hidden &&
+            field("vehicle").value === "Opel Astra" &&
+            field("message").value === message,
+          "uređivanje nacrta zadržava unesene podatke",
+        );
+        set("message", "   ");
+        form.requestSubmit();
+        record(
+          lang,
+          !form.hidden &&
+            result.hidden &&
+            !field("message").validity.valid &&
+            requiredLanguage.test(field("message").validationMessage),
+          "prazna poruka odbijena i nakon uređivanja nacrta",
+        );
+      } finally {
+        form.reset();
+        [...form.elements].forEach((el) => el.setCustomValidity?.(""));
+        dialog.close();
+        preview.contentWindow.scrollTo(0, 0);
+      }
+    }
+
+    language.addEventListener("change", () =>
+      runChecks(async () => {
+        const lang = language.value;
+        const doc = await loadPage(lang);
+        results[lang] = [];
+        await checkResponsive(lang, doc);
+      }),
+    );
+    document.querySelector("#check-all").addEventListener("click", () =>
+      runChecks(async () => {
+        for (const lang of Object.keys(pages)) {
+          results[lang] = [];
+          const doc = await loadPage(lang);
+          await checkResponsive(lang, doc);
+          checkForm(lang, doc);
+        }
+      }),
+    );
+    document.querySelector("#check-form").addEventListener("click", () =>
+      runChecks(async () => {
+        checkForm(language.value, preview.contentDocument);
+      }),
+    );
+    document.querySelectorAll("[data-width]").forEach((button) => {
+      button.addEventListener("click", () => {
+        preview.style.width = button.dataset.width + "px";
+      });
+    });
+    renderResults();
+    runChecks(async () => {
+      const doc = await loadPage("hr");
+      await checkResponsive("hr", doc);
     });
   </script>
 </html>

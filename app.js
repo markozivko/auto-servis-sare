@@ -1,6 +1,83 @@
 (() => {
   "use strict";
 
+  const translations = {
+    hr: {
+      menuOpen: "Otvori izbornik",
+      menuClose: "Zatvori izbornik",
+      required: {
+        name: "Unesite svoje ime i prezime.",
+        email: "Unesite svoju e-mail adresu.",
+        service: "Odaberite uslugu.",
+        message: "Ukratko opišite što je potrebno vašem vozilu.",
+      },
+      invalidEmail: "Unesite ispravnu e-mail adresu.",
+      copied: "Tekst upita je kopiran.",
+      copyUnavailable:
+        "Automatsko kopiranje nije dostupno. Označeni tekst kopirajte naredbom Kopiraj.",
+      inquiry: {
+        greeting: "Poštovani,",
+        service: "zanima me usluga",
+        vehicle: "Vozilo",
+        followUp: "Molim vas da mi se javite radi dogovora i potvrde termina.",
+        name: "Ime i prezime",
+        email: "E-mail",
+        phone: "Telefon",
+        signOff: "Lijep pozdrav,",
+        subject: "Upit za servis",
+      },
+    },
+    en: {
+      menuOpen: "Open menu",
+      menuClose: "Close menu",
+      required: {
+        name: "Enter your full name.",
+        email: "Enter your email address.",
+        service: "Select a service.",
+        message: "Briefly describe what your vehicle needs.",
+      },
+      invalidEmail: "Enter a valid email address.",
+      copied: "Your enquiry has been copied.",
+      copyUnavailable:
+        "Automatic copying is unavailable. Use the Copy command to copy the selected text.",
+      inquiry: {
+        greeting: "Hello,",
+        service: "I would like to enquire about",
+        vehicle: "Vehicle",
+        followUp: "Please contact me to arrange and confirm an appointment.",
+        name: "Full name",
+        email: "Email",
+        phone: "Phone",
+        signOff: "Kind regards,",
+        subject: "Service enquiry",
+      },
+    },
+  };
+  const language = document.documentElement.lang.toLowerCase().split("-")[0];
+  const messages = language === "en" ? translations.en : translations.hr;
+
+  // Keep language links usable without JavaScript and with modifier keys.
+  const languageLinks = Array.from(
+    document.querySelectorAll("a[data-language-link][href]"),
+    (link) => ({ link, href: link.getAttribute("href").split("#")[0] }),
+  );
+  const sectionHashes = new Set(
+    Array.from(
+      document.querySelectorAll("main[id], main section[id]"),
+      (section) => `#${section.id}`,
+    ),
+  );
+  function updateLanguageLinks() {
+    const hash = sectionHashes.has(window.location.hash)
+      ? window.location.hash
+      : "";
+    languageLinks.forEach(({ link, href }) => {
+      link.setAttribute("href", href + hash);
+    });
+  }
+  updateLanguageLinks();
+  window.addEventListener("hashchange", updateLanguageLinks);
+
   const menuToggle = document.querySelector("#menu-toggle");
   const mainNav = document.querySelector("#main-nav");
   const desktopViewport = window.matchMedia("(min-width: 1000px)");
@@ -9,7 +86,7 @@
     if (!menuToggle || !mainNav) return;
     const wasOpen = menuToggle.getAttribute("aria-expanded") === "true";
     menuToggle.setAttribute("aria-expanded", "false");
-    menuToggle.setAttribute("aria-label", "Otvori izbornik");
+    menuToggle.setAttribute("aria-label", messages.menuOpen);
     mainNav.classList.remove("is-open");
     if (restoreFocus && wasOpen) menuToggle.focus();
   }
@@ -20,7 +97,7 @@
     menuToggle.setAttribute("aria-expanded", String(!isOpen));
     menuToggle.setAttribute(
       "aria-label",
-      isOpen ? "Otvori izbornik" : "Zatvori izbornik",
+      isOpen ? messages.menuOpen : messages.menuClose,
     );
     mainNav.classList.toggle("is-open", !isOpen);
   });
@@ -124,20 +201,22 @@
     });
   });
 
-  const requiredMessages = {
-    name: "Unesite svoje ime i prezime.",
-    email: "Unesite svoju e-mail adresu.",
-    service: "Odaberite uslugu.",
-    message: "Ukratko opišite što je potrebno vašem vozilu.",
-  };
+  function validateField(name) {
+    const input = field(name);
+    if (!input) return;
+    input.setCustomValidity("");
+    if (!input.value.trim()) {
+      input.setCustomValidity(messages.required[name]);
+    } else if (name === "email" && input.validity.typeMismatch) {
+      input.setCustomValidity(messages.invalidEmail);
+    }
+  }
 
-  Object.entries(requiredMessages).forEach(([name, message]) => {
+  Object.keys(messages.required).forEach((name) => {
     const input = field(name);
     if (!input) return;
     input.required = true;
-    const validate = () => {
-      input.setCustomValidity(input.value.trim() ? "" : message);
-    };
+    const validate = () => validateField(name);
     input.addEventListener("input", validate);
     input.addEventListener("change", validate);
   });
@@ -145,11 +224,11 @@
   bookingForm?.addEventListener("submit", (event) => {
     event.preventDefault();
 
-    Object.entries(requiredMessages).forEach(([name, message]) => {
+    Object.keys(messages.required).forEach((name) => {
       const input = field(name);
       if (input) {
         input.value = input.value.trim();
-        input.setCustomValidity(input.value ? "" : message);
+        validateField(name);
       }
     });
 
@@ -157,23 +236,26 @@
 
     const value = (name) => field(name)?.value.trim() || "";
     const name = value("name");
-    const service = value("service");
+    const service = field("service")
+      .selectedOptions[0].textContent.trim()
+      .replace(/\s+/g, " ");
     const vehicle = value("vehicle");
+    const inquiry = messages.inquiry;
     preparedInquiry = [
-      "Poštovani,",
+      inquiry.greeting,
       "",
-      `zanima me usluga: ${service}.`,
-      ...(vehicle ? [`Vozilo: ${vehicle}`] : []),
+      `${inquiry.service}: ${service}.`,
+      ...(vehicle ? [`${inquiry.vehicle}: ${vehicle}`] : []),
       "",
       value("message"),
       "",
-      "Molim vas da mi se javite radi dogovora i potvrde termina.",
+      inquiry.followUp,
       "",
-      `Ime i prezime: ${name}`,
-      `E-mail: ${value("email")}`,
-      ...(value("phone") ? [`Telefon: ${value("phone")}`] : []),
+      `${inquiry.name}: ${name}`,
+      `${inquiry.email}: ${value("email")}`,
+      ...(value("phone") ? [`${inquiry.phone}: ${value("phone")}`] : []),
       "",
-      "Lijep pozdrav,",
+      inquiry.signOff,
       name,
     ].join("\n");
 
@@ -183,7 +265,7 @@
     }
 
     if (emailDraft) {
-      const subject = `Upit za servis — ${service}${vehicle ? ` — ${vehicle}` : ""}`;
+      const subject = `${inquiry.subject} — ${service}${vehicle ? ` — ${vehicle}` : ""}`;
       emailDraft.href =
         `mailto:auto-servis@opel-sare.hr?subject=${encodeURIComponent(subject)}` +
         `&body=${encodeURIComponent(preparedInquiry)}`;
@@ -215,7 +297,7 @@
         if (!navigator.clipboard?.writeText)
           throw new Error("Clipboard unavailable");
         await navigator.clipboard.writeText(preparedInquiry);
-        if (copyStatus) copyStatus.textContent = "Tekst upita je kopiran.";
+        if (copyStatus) copyStatus.textContent = messages.copied;
       } catch {
         if (inquiryPreview && "select" in inquiryPreview) {
           inquiryPreview.focus();
@@ -223,8 +305,7 @@
           inquiryPreview.setSelectionRange(0, inquiryPreview.value.length);
         }
         if (copyStatus) {
-          copyStatus.textContent =
-            "Automatsko kopiranje nije dostupno. Označeni tekst kopirajte naredbom Kopiraj.";
+          copyStatus.textContent = messages.copyUnavailable;
         }
       }
     });

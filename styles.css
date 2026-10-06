@@ -201,7 +201,7 @@ h3 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 40px;
+  gap: 24px;
 }
 .brand {
   display: flex;
@@ -239,9 +239,42 @@ h3 {
 .main-nav {
   display: flex;
   align-items: center;
-  gap: 35px;
+  margin-left: auto;
+  gap: 28px;
   font-size: 12px;
   font-weight: 600;
+}
+.language-switch {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 2px;
+  order: 2;
+  padding: 3px;
+  border: 1px solid #ffffff30;
+  border-radius: 5px;
+}
+.language-switch a {
+  display: grid;
+  place-items: center;
+  min-width: 38px;
+  min-height: 38px;
+  border-radius: 2px;
+  color: #d4d6cf;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+.language-switch a:hover {
+  background: #ffffff14;
+  color: var(--white);
+}
+.language-switch a[aria-current="page"] {
+  background: var(--yellow);
+  color: var(--ink);
 }
 .main-nav > a {
   padding: 12px 0;
@@ -1384,7 +1417,15 @@ textarea:hover {
     width: calc(100% - 72px);
   }
   .main-nav {
-    gap: 24px;
+    gap: 17px;
+  }
+  .nav-inner {
+    gap: 16px;
+  }
+  .nav-booking {
+    margin-left: 0;
+    gap: 14px;
+    padding-inline: 15px;
   }
   .services-layout {
     gap: 35px;
@@ -1426,10 +1467,16 @@ textarea:hover {
   }
   .nav-inner {
     height: 76px;
+    gap: 12px;
+  }
+  .language-switch {
+    order: 0;
+    margin-left: auto;
   }
   .main-nav {
     display: none;
     position: absolute;
+    margin-left: 0;
     top: 76px;
     left: 0;
     right: 0;
@@ -1658,6 +1705,7 @@ textarea:hover {
   }
   .nav-inner {
     height: 72px;
+    gap: 8px;
   }
   .brand-name {
     font-size: 35px;

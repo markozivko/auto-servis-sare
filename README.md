@@ -6,7 +6,7 @@ Moderna, responzivna web-stranica za Auto servis Šare na zagrebačkom Črnomerc
 
 ## Trenutačno stanje
 
-Izrađena je prva funkcionalna verzija redizajna. Cjenik zasad prikazuje **„Cijena na upit”**, a obrazac priprema e-mail koji korisnik pregledava i sam šalje iz svoje e-mail aplikacije. Automatsko slanje upita i rezervacija termina nisu implementirani.
+Stranica je dostupna na hrvatskom i engleskom jeziku, uz izbor **HR | EN** u zaglavlju. Cjenik zasad prikazuje **„Cijena na upit”** / **„Price on request”**, a obrazac priprema e-mail koji korisnik pregledava i sam šalje iz svoje e-mail aplikacije. Automatsko slanje upita i rezervacija termina nisu implementirani.
 
 Stranica sadrži:
 
@@ -29,6 +29,8 @@ python3 -m http.server 8000 --bind 127.0.0.1
 
 Otvorite **[http://127.0.0.1:8000](http://127.0.0.1:8000)**. Poslužitelj zaustavite tipkama `Ctrl+C` u istom terminalu. Naredba služi za lokalni pregled na vašem računalu.
 
+Engleska verzija dostupna je na **[http://127.0.0.1:8000/en/](http://127.0.0.1:8000/en/)**. Oba jezika mogu se otvoriti izravno ili preko izbora jezika u zaglavlju.
+
 Za preuzimanje projekta na drugo računalo, uz instaliran Git:
 
 ```sh
@@ -40,15 +42,24 @@ Zatim pokrenite lokalni poslužitelj prethodnom naredbom. Nisu potrebni `npm ins
 
 ## Struktura projekta
 
-| Datoteka ili folder | Namjena |
-| --- | --- |
-| [`index.html`](index.html) | Sadržaj stranice, cjenik, karta, obrazac i dijalozi. |
-| [`styles.css`](styles.css) | Boje, tipografija, raspored i responzivni prikaz. |
-| [`app.js`](app.js) | Mobilni izbornik, dijalozi, validacija i priprema e-mail upita. |
-| [`assets/`](assets/) | Fotografije, ikona stranice, lokalni fontovi i njihove licence. |
-| [`qa-preview.html`](qa-preview.html) | Razvojni alat za provjeru širina prikaza i ponašanja obrasca. |
-| [`.gitignore`](.gitignore) | Pravila za izostavljanje lokalnih i pomoćnih datoteka iz Gita. |
-| [`README.md`](README.md) | Upute za pokretanje, održavanje i objavu. |
+| Datoteka ili folder                  | Namjena                                                                                  |
+| ------------------------------------ | ---------------------------------------------------------------------------------------- |
+| [`index.html`](index.html)           | Hrvatski sadržaj, cjenik, karta, obrazac i dijalozi.                                     |
+| [`en/index.html`](en/index.html)     | Engleski sadržaj, cjenik, karta, obrazac i dijalozi.                                     |
+| [`styles.css`](styles.css)           | Zajedničke boje, tipografija, raspored i responzivni prikaz za oba jezika.               |
+| [`app.js`](app.js)                   | Zajednički mobilni izbornik, dijalozi, HR/EN poruke, validacija i priprema e-mail upita. |
+| [`assets/`](assets/)                 | Fotografije, ikona stranice, lokalni fontovi i njihove licence.                          |
+| [`qa-preview.html`](qa-preview.html) | Razvojni alat za provjeru širina prikaza i ponašanja obrasca na oba jezika.              |
+| [`.gitignore`](.gitignore)           | Pravila za izostavljanje lokalnih i pomoćnih datoteka iz Gita.                           |
+| [`README.md`](README.md)             | Upute za pokretanje, održavanje i objavu.                                                |
+
+## Jezici i prijevodi
+
+Hrvatski je zadani jezik na osnovnoj adresi, a engleski se otvara na putanji `en/`. Izbor **HR | EN** koristi obične poveznice, pa radi i bez JavaScripta. Nema automatskog prepoznavanja jezika preglednika, preusmjeravanja ni spremanja jezika u `localStorage`. Kada je otvorena poveznica na sekciju, JavaScript prenosi njezin hash pri promjeni jezika.
+
+Vidljivi sadržaj nalazi se u dvije HTML datoteke koje treba održavati zajedno. Fotografije, fontovi, `styles.css` i `app.js` zajednički su. Dinamične poruke, uključujući poruke validacije, stanje mobilnog izbornika, potvrdu kopiranja te predložak i predmet e-maila, nalaze se u HR/EN rječniku u `app.js`; jezik se bira prema atributu `lang` dokumenta.
+
+Vrijednosti usluga u atributima `data-service` i `value` ostaju iste na oba jezika: `mechanics`, `diagnostics`, `electrics`, `tyres`, `air-conditioning`, `inspection` i `other`. Prevodi se tekst opcije koji korisnik vidi, a taj se tekst koristi i u pripremljenom e-mailu. Korisnikov vlastiti unos ne prevodi se.
 
 ## Kako funkcionira obrazac
 
@@ -66,7 +77,7 @@ Obrazac nema backend, bazu podataka ni povezivanje s kalendarom. Podatke ne spre
 
 ### Cjenik
 
-Odjeljak `#cjenik` u `index.html` nalazi se između pregleda usluga i predstavljanja servisa. Sadrži šest kategorija s oznakom **„Cijena na upit”**. Gumb **„Zatraži procjenu”** otvara obrazac s odabranom opcijom „Ostalo / nisam siguran”.
+Odjeljak `#cjenik` u `index.html` i `en/index.html` nalazi se između pregleda usluga i predstavljanja servisa. Sadrži šest kategorija s oznakom **„Cijena na upit”** / **„Price on request”**. Gumb **„Zatraži procjenu”** / **„Request an estimate”** otvara obrazac s odabranom opcijom za ostale usluge.
 
 Kada konačni cjenik bude spreman:
 
@@ -74,12 +85,13 @@ Kada konačni cjenik bude spreman:
 2. Zamijenite tekst „Cijena na upit” potvrđenim iznosima i načinom obračuna.
 3. Prema potrebi prilagodite nazive i broj redaka te napomenu ispod gumba.
 4. Uskladite povezani odgovor „Koliko će koštati servis?” u čestim pitanjima.
+5. Iste iznose i odgovarajuće prijevode unesite u obje HTML datoteke.
 
 Iznosi, obračunske jedinice i porezne napomene zasad nisu zadani.
 
 ### Kontaktni podaci
 
-Adresa, telefon i radno vrijeme uređuju se u `index.html`. Pri promjeni provjerite sve njihove pojave, uključujući poveznice `tel:` i `mailto:`, česta pitanja i obavijest o privatnosti. Adresa primatelja pripremljenog e-maila postavljena je i u `app.js`.
+Adresa, telefon i radno vrijeme uređuju se u `index.html` i `en/index.html`. Pri promjeni provjerite sve njihove pojave na oba jezika, uključujući poveznice `tel:` i `mailto:`, česta pitanja i obavijest o privatnosti. Adresa primatelja pripremljenog e-maila postavljena je i u `app.js`.
 
 ### Google karta
 
@@ -87,7 +99,7 @@ Kontakt sadrži Google Maps `iframe` za **Auto servis Šare, Črnomerec 35, Zagr
 
 - Google CID lokacije: `3651087283997827513`.
 - Koordinate za upute za dolazak: `45.8172058,15.9369876`.
-- Pri promjeni lokacije ažurirajte ugrađenu kartu, poveznicu na profil i poveznicu „Upute za dolazak”.
+- Pri promjeni lokacije u obje HTML datoteke ažurirajte ugrađenu kartu, poveznicu na profil i poveznicu „Upute za dolazak” / „Get directions”.
 
 Google karta zahtijeva internetsku vezu i povezuje preglednik s Googleom. Fotografije i fontovi učitavaju se lokalno iz projekta. Stranica nema vlastitu analitiku ni marketinške skripte; Google integracija opisana je u obavijesti o privatnosti.
 
@@ -100,23 +112,27 @@ Dizajn kombinira antracitnu i žutu paletu, veliki automobilski vizual, pregledn
 
 Primijenjene dizajnerske smjernice: [Anthropic frontend-design](https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md) i [Vercel web-design-guidelines](https://github.com/vercel-labs/agent-skills/tree/main/skills/web-design-guidelines).
 
-| Fotografija | Namjena i izvor |
-| --- | --- |
-| `opel-grandland.jpg` | Naslovna fotografija vozila — [izvor](https://www.opel-sare.hr/wp-content/uploads/2025/02/Grandland-1.jpg). |
-| `mehanika.jpg` | Mehaničar u radionici — [izvor](https://www.opel-sare.hr/wp-content/uploads/2018/05/Mehanika1-800x490.jpg). |
+| Fotografija             | Namjena i izvor                                                                                                  |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `opel-grandland.jpg`    | Naslovna fotografija vozila — [izvor](https://www.opel-sare.hr/wp-content/uploads/2025/02/Grandland-1.jpg).      |
+| `mehanika.jpg`          | Mehaničar u radionici — [izvor](https://www.opel-sare.hr/wp-content/uploads/2018/05/Mehanika1-800x490.jpg).      |
 | `servis-eksterijer.jpg` | Ulaz u servis na Črnomercu 35 — [izvor](https://www.opel-sare.hr/wp-content/uploads/2018/05/Front1-800x490.jpg). |
 
 `opel-astra.webp`, `radionica.jpg` i `logo-original.png` pohranjeni su kao reference za daljnji razvoj; trenutačna stranica ih ne učitava. Fotografije su preuzete s postojećeg weba za prijedlog redizajna i nisu nove snimke servisa. Tipografski znak ŠARE dizajnerski je prijedlog.
 
 ## Provjera nakon izmjena
 
-Uz pokrenut lokalni poslužitelj otvorite [qa-preview.html](http://127.0.0.1:8000/qa-preview.html). Alat provjerava horizontalno prelijevanje na širinama **320, 375, 390, 768, 1000, 1024, 1440 i 1920 px**, učitavanje fontova te prijavljuje otkrivene neispravne slike.
+Uz pokrenut lokalni poslužitelj otvorite [qa-preview.html](http://127.0.0.1:8000/qa-preview.html). Izbornik **„Jezik pregleda”** otvara hrvatsku ili englesku stranicu. Alat provjerava horizontalno prelijevanje na širinama **320, 375, 390, 768, 1000, 1024, 1440 i 1920 px**, oznaku jezika dokumenta te učitavanje fontova i slika. Gumbi sa širinama služe za ručni pregled.
 
-Gumb **„Provjeri obrazac bez slanja”** koristi izmišljene podatke za provjeru odabira usluge, uklanjanja rubnih razmaka, hrvatskih znakova u nacrtu, uređivanja i odbijanja prazne poruke. Ne otvara e-mail aplikaciju i ne šalje e-poštu.
+Gumb **„Provjeri oba jezika i obrasce”** redom provjerava obje verzije i zadržava rezultate odvojeno za HR i EN. **„Provjeri trenutačni obrazac”** provjerava samo trenutačno otvoreni jezik. Provjera obrasca koristi izmišljene podatke i obuhvaća:
 
-Ručno provjerite mobilni izbornik, čitljivost cjenika, Google kartu, poveznice i zatvaranje dijaloga tipkom `Escape`. Razvojni pregled ne zamjenjuje provjeru na stvarnom telefonu.
+- Odabir svih sedam usluga preko gumba na stranici.
+- Obavezna polja i neispravnu e-mail adresu, uz poruke na odabranom jeziku.
+- Prevedeni predmet, predložak i naziv odabrane usluge u nacrtu.
+- Uklanjanje rubnih razmaka i očuvanje izvornog korisničkog teksta, hrvatskih znakova i prijeloma redaka.
+- Uređivanje nacrta i odbijanje poruke koja sadrži samo razmake.
 
-Tijekom izrade stranica je pregledana u Braveu i Safariju, a responzivni prikaz i obrazac provjereni su u Safariju bez slanja e-pošte. Nakon budućih izmjena provjere treba ponoviti.
+Alat ne otvara e-mail aplikaciju, ne šalje e-poštu i ne kopira tekst u međuspremnik. Ručno na oba jezika provjerite mobilni izbornik, čitljivost cjenika, Google kartu, poveznice, prebacivanje jezika iz pojedine sekcije, poruku nakon kopiranja i zatvaranje dijaloga tipkom `Escape`. Razvojni pregled ne zamjenjuje provjeru na stvarnom telefonu. Nakon budućih izmjena provjere treba ponoviti.
 
 ## Rad s GitHubom
 
@@ -137,7 +153,9 @@ git push
 
 ## Objava web-stranice
 
-Projekt se može posluživati kao statička stranica: na hosting se prenose `index.html`, `styles.css`, `app.js` i potrebni resursi iz `assets/`, uz očuvanje njihove strukture. Nema build koraka. Za javni web koristite HTTPS.
+Projekt se može posluživati kao statička stranica: na hosting se prenose `index.html`, cijeli folder `en/`, `styles.css`, `app.js` i potrebni resursi iz `assets/`, uz očuvanje njihove strukture. Nema build koraka. Za javni web koristite HTTPS.
+
+Oznake `canonical`, `hreflang="hr"`, `hreflang="en"` i `hreflang="x-default"` u obje HTML datoteke koriste baznu adresu projekta `https://markozivko.github.io/auto-servis-sare/`, s engleskom verzijom na `en/`. Kada se promijeni hosting ili domena, ažurirajte sve te apsolutne adrese u obje datoteke tako da upućuju na stvarne javne adrese. Hrvatski ostaje zadana verzija (`x-default`).
 
 `qa-preview.html` može ostati u izvornom repozitoriju kao razvojni alat, ali ga izostavite iz datoteka objavljenog weba. `.gitignore` ne upravlja objavom na hosting.
 
