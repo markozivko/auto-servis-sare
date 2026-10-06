@@ -1,3 +1,4 @@
+/* Local fonts */
 @font-face {
   font-family: Manrope;
   src: url("assets/manrope-variable.ttf") format("truetype");
@@ -13,6 +14,7 @@
   font-display: swap;
 }
 
+/* Design tokens and shared foundations */
 :root {
   --ink: #171918;
   --ink-soft: #242724;
@@ -166,6 +168,7 @@ h3 {
 .skip-link:focus {
   transform: translateY(0);
 }
+/* Header, navigation and buttons */
 .utility-bar {
   background: #222521;
   color: #c8cac2;
@@ -337,6 +340,7 @@ h3 {
   display: none;
 }
 
+/* Hero */
 .hero {
   position: relative;
   isolation: isolate;
@@ -418,9 +422,9 @@ h1 > span {
 }
 .hero-description {
   color: #c4c7bf;
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.85;
-  max-width: 370px;
+  max-width: 410px;
   text-wrap: pretty;
 }
 .hero-actions {
@@ -517,6 +521,7 @@ h1 > span {
   color: var(--yellow);
   line-height: 1;
 }
+/* Trust strip */
 .trust-strip {
   border-bottom: 1px solid var(--line);
   background: #eeefe8;
@@ -548,6 +553,7 @@ h1 > span {
   color: var(--muted);
 }
 
+/* Section headings and services */
 .section-kicker {
   font-size: 11px;
   font-weight: 700;
@@ -678,7 +684,7 @@ details[open] > summary > .expand-icon {
 }
 .service-content {
   padding: 0 15px 25px 47px;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--muted);
 }
 .service-content p {
@@ -741,6 +747,7 @@ details[open] > summary > .expand-icon {
   height: 18px;
 }
 
+/* Service guide */
 .section.guide-section {
   padding-top: 0;
 }
@@ -978,6 +985,7 @@ details[open] > summary > .expand-icon {
   font-size: 10px;
 }
 
+/* Pricing */
 .pricing-section {
   background: var(--ink);
   color: var(--white);
@@ -1045,39 +1053,8 @@ details[open] > summary > .expand-icon {
 .pricing-section :focus-visible {
   outline-color: var(--yellow);
 }
-@media (max-width: 999px) {
-  .pricing-layout {
-    grid-template-columns: 0.8fr 1.2fr;
-    gap: 40px;
-  }
-  .pricing-table {
-    font-size: 14px;
-  }
-}
-@media (max-width: 699px) {
-  .pricing-layout {
-    grid-template-columns: 1fr;
-    gap: 36px;
-  }
-  .pricing-intro > p {
-    font-size: 14px;
-  }
-  .pricing-intro > .pricing-note {
-    font-size: 13px;
-  }
-  .pricing-table th,
-  .pricing-table td {
-    padding-block: 19px;
-  }
-  .pricing-table th:first-child {
-    width: 65%;
-    padding-right: 16px;
-  }
-  .pricing-table .price-value {
-    font-size: 14px;
-  }
-}
 
+/* About the garage */
 .about-section {
   background: #eaece4;
 }
@@ -1143,7 +1120,7 @@ details[open] > summary > .expand-icon {
 }
 .about-copy > p:not(.section-kicker):not(.about-lead) {
   color: #62675c;
-  font-size: 12px;
+  font-size: 14px;
   margin-bottom: 14px;
   max-width: 405px;
 }
@@ -1151,6 +1128,7 @@ details[open] > summary > .expand-icon {
   margin-top: 10px;
 }
 
+/* Service process */
 .process-section {
   background: var(--ink);
   color: var(--white);
@@ -1197,11 +1175,12 @@ details[open] > summary > .expand-icon {
   margin: 0 0 10px;
 }
 .process-grid p {
-  font-size: 11px;
+  font-size: 13px;
   color: #b8bfb0;
   max-width: 250px;
 }
 
+/* Frequently asked questions */
 .faq-layout {
   display: grid;
   grid-template-columns: 0.9fr 1.1fr;
@@ -1237,7 +1216,7 @@ details[open] > summary > .expand-icon {
   align-items: center;
 }
 .faq-list details > p {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--muted);
   padding: 0 35px 24px 0;
   max-width: 510px;
@@ -1247,6 +1226,7 @@ details[open] > summary > .expand-icon {
   text-underline-offset: 3px;
 }
 
+/* Contact and map */
 .contact-section {
   background: var(--yellow);
   padding: 76px 0 63px;
@@ -1359,31 +1339,7 @@ details[open] > summary > .expand-icon {
   height: 420px;
   border: 0;
 }
-@media (max-width: 699px) {
-  .location-map {
-    margin-top: 32px;
-  }
-  .map-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 18px;
-    padding: 22px 20px;
-  }
-  .map-description {
-    align-items: flex-start;
-    gap: 12px;
-  }
-  .map-description h3 {
-    font-size: 16px;
-    text-wrap: pretty;
-  }
-  .map-description p {
-    font-size: 12px;
-  }
-  .map-frame {
-    height: 340px;
-  }
-}
+/* Footer and mobile actions */
 .site-footer {
   background: var(--ink);
   color: #b5bbad;
@@ -1444,6 +1400,7 @@ details[open] > summary > .expand-icon {
   display: none;
 }
 
+/* Dialogs and enquiry form */
 dialog {
   color: var(--ink);
   background: var(--paper);
@@ -1621,6 +1578,7 @@ textarea:hover {
   text-align: center;
 }
 
+/* Responsive: wide desktop */
 @media (min-width: 1700px) {
   :root {
     --container: 1440px;
@@ -1632,9 +1590,8 @@ textarea:hover {
   h1 {
     font-size: 128px;
   }
-  .hero-description {
-    font-size: 15px;
-    max-width: 430px;
+  .hero-content {
+    max-width: 720px;
   }
   .hero-intro {
     font-size: 12px;
@@ -1649,6 +1606,7 @@ textarea:hover {
     min-height: 585px;
   }
 }
+/* Responsive: compact desktop */
 @media (max-width: 1199px) {
   .container {
     width: calc(100% - 72px);
@@ -1695,6 +1653,7 @@ textarea:hover {
     min-height: 640px;
   }
 }
+/* Responsive: tablet and mobile navigation */
 @media (max-width: 999px) {
   html {
     scroll-padding-top: 94px;
@@ -1725,6 +1684,9 @@ textarea:hover {
     border-top: 1px solid #ffffff20;
     border-bottom: 1px solid #ffffff20;
     box-shadow: 0 20px 30px #0003;
+    max-height: calc(100dvh - 76px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
   .main-nav.is-open {
     display: flex;
@@ -1795,9 +1757,6 @@ textarea:hover {
   .hero-location > .icon {
     width: 19px;
   }
-  .hero-description {
-    max-width: 340px;
-  }
   .hero-actions .button {
     padding: 14px 18px;
     gap: 16px;
@@ -1819,7 +1778,6 @@ textarea:hover {
   }
   .section-heading > p {
     max-width: 265px;
-    font-size: 12px;
   }
   .services-layout {
     gap: 28px;
@@ -1840,18 +1798,48 @@ textarea:hover {
   }
   .service-item summary {
     gap: 13px;
+    min-height: 80px;
   }
   .service-icon {
     width: 23px;
     height: 23px;
   }
   .service-content {
-    font-size: 11px;
     padding-left: 36px;
     padding-right: 0;
   }
-  .service-item summary {
-    min-height: 80px;
+  .guide-panel {
+    gap: 36px;
+    padding: 36px;
+    grid-template-columns: 0.85fr 1.15fr;
+  }
+  .guide-choices {
+    grid-template-columns: 1fr;
+  }
+  .guide-choice {
+    grid-template-columns: 26px minmax(0, 1fr) 18px;
+    align-items: center;
+    align-content: center;
+    min-height: 76px;
+    gap: 14px;
+    padding: 18px;
+  }
+  .guide-choice > .icon:first-child {
+    grid-column: auto;
+  }
+  .guide-choice > span,
+  .guide-choice .guide-choice-arrow {
+    align-self: center;
+  }
+  .guide-choice .guide-choice-arrow {
+    margin-bottom: 0;
+  }
+  .pricing-layout {
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 40px;
+  }
+  .pricing-table {
+    font-size: 14px;
   }
   .about-layout {
     gap: 38px;
@@ -1880,9 +1868,6 @@ textarea:hover {
   }
   .process-grid h3 {
     font-size: 13px;
-  }
-  .process-grid p {
-    font-size: 10px;
   }
   .process-heading h2 {
     font-size: 52px;
@@ -1914,13 +1899,14 @@ textarea:hover {
     font-size: 8px;
   }
 }
+/* Responsive: mobile */
 @media (max-width: 699px) {
   html {
     scroll-padding-top: 94px;
     scroll-padding-bottom: 90px;
   }
   body {
-    padding-bottom: 67px;
+    padding-bottom: calc(67px + env(safe-area-inset-bottom));
   }
   .container {
     width: calc(100% - 40px);
@@ -1960,6 +1946,7 @@ textarea:hover {
   .main-nav {
     top: 72px;
     padding-inline: 20px;
+    max-height: calc(100dvh - 72px);
   }
   .hero-inner {
     min-height: 785px;
@@ -1978,13 +1965,13 @@ textarea:hover {
     height: 5px;
   }
   h1 {
-    font-size: clamp(65px, 12vw, 84px);
+    font-size: clamp(50px, 16vw, 100px);
     margin: 22px 0 22px;
     line-height: 0.94;
   }
   .hero-description {
-    font-size: 12px;
-    max-width: 330px;
+    font-size: 13px;
+    max-width: 350px;
     color: #c5cabe;
   }
   .hero-actions {
@@ -2013,6 +2000,20 @@ textarea:hover {
     top: 350px;
     height: 410px;
     opacity: 1;
+    -webkit-mask-image: linear-gradient(
+      180deg,
+      transparent,
+      #000 26%,
+      #000 85%,
+      transparent
+    );
+    mask-image: linear-gradient(
+      180deg,
+      transparent,
+      #000 26%,
+      #000 85%,
+      transparent
+    );
   }
   .hero-visual img {
     object-position: 60% 50%;
@@ -2091,7 +2092,6 @@ textarea:hover {
   .section-heading > p {
     max-width: 340px;
     margin-top: 22px;
-    font-size: 12px;
   }
   .services-layout {
     display: flex;
@@ -2137,7 +2137,7 @@ textarea:hover {
     font-size: 13px;
   }
   .service-content {
-    font-size: 12px;
+    font-size: 13px;
     padding-left: 40px;
   }
   .service-item[open] summary {
@@ -2157,6 +2157,67 @@ textarea:hover {
   }
   .services-note .icon {
     flex-shrink: 0;
+  }
+  .guide-panel {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 28px 22px;
+  }
+  .guide-intro h2 {
+    max-width: 300px;
+    font-size: 44px;
+  }
+  .guide-kicker {
+    margin-bottom: 14px;
+  }
+  .guide-description {
+    margin-top: 18px;
+    font-size: 13px;
+  }
+  .guide-phone {
+    margin-top: 20px;
+  }
+  .guide-interaction {
+    padding-top: 25px;
+    border-top: 1px solid #50544c;
+  }
+  .guide-choice {
+    padding: 16px 14px;
+  }
+  .guide-choice > span {
+    font-size: 12px;
+  }
+  .guide-fieldset legend {
+    font-size: 17px;
+  }
+  .guide-panel .guide-answer {
+    padding: 12px;
+  }
+  .guide-continue {
+    width: 100%;
+    gap: 16px;
+    padding-inline: 18px;
+  }
+  .pricing-layout {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  .pricing-intro > p {
+    font-size: 14px;
+  }
+  .pricing-intro > .pricing-note {
+    font-size: 13px;
+  }
+  .pricing-table th,
+  .pricing-table td {
+    padding-block: 19px;
+  }
+  .pricing-table th:first-child {
+    width: 65%;
+    padding-right: 16px;
+  }
+  .pricing-table .price-value {
+    font-size: 14px;
   }
   .about-layout {
     display: flex;
@@ -2198,7 +2259,7 @@ textarea:hover {
     margin-top: 23px;
   }
   .about-copy > p:not(.section-kicker):not(.about-lead) {
-    font-size: 12px;
+    font-size: 13px;
   }
   .about-copy .text-link {
     font-size: 10px;
@@ -2233,7 +2294,7 @@ textarea:hover {
     margin-bottom: 7px;
   }
   .process-grid p {
-    font-size: 11px;
+    font-size: 12px;
     max-width: 270px;
   }
   .faq-layout {
@@ -2257,7 +2318,7 @@ textarea:hover {
     padding: 23px 0;
   }
   .faq-list details > p {
-    font-size: 12px;
+    font-size: 13px;
     padding-right: 18px;
   }
   .contact-section {
@@ -2307,6 +2368,29 @@ textarea:hover {
   .contact-item > .weekend-note {
     margin-top: 13px;
     font-size: 10px;
+  }
+  .location-map {
+    margin-top: 32px;
+  }
+  .map-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+    padding: 22px 20px;
+  }
+  .map-description {
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .map-description h3 {
+    font-size: 16px;
+    text-wrap: pretty;
+  }
+  .map-description p {
+    font-size: 12px;
+  }
+  .map-frame {
+    height: 340px;
   }
   .site-footer {
     padding: 35px 0 20px;
@@ -2424,7 +2508,7 @@ textarea:hover {
     font-size: 12px;
   }
   #inquiry-preview {
-    font-size: 12px;
+    font-size: 16px;
   }
   .form-submit,
   #email-draft {
@@ -2436,12 +2520,10 @@ textarea:hover {
     outline-offset: 3px;
   }
 }
+/* Responsive: narrow mobile */
 @media (max-width: 374px) {
   .container {
     width: calc(100% - 32px);
-  }
-  h1 {
-    font-size: 59px;
   }
   .hero-intro {
     font-size: 8px;
@@ -2450,9 +2532,6 @@ textarea:hover {
     padding-inline: 11px;
     font-size: 10px;
     gap: 9px;
-  }
-  .hero-description {
-    font-size: 11px;
   }
   .hero-inner {
     min-height: 764px;
@@ -2474,145 +2553,7 @@ textarea:hover {
     font-size: 43px;
   }
 }
-@media (min-width: 1700px) {
-  .hero-content {
-    max-width: 720px;
-  }
-}
-@media (max-width: 999px) {
-  .main-nav {
-    max-height: calc(100dvh - 76px);
-    overflow-y: auto;
-    overscroll-behavior: contain;
-  }
-}
-@media (max-width: 699px) {
-  h1 {
-    font-size: clamp(50px, 16vw, 100px);
-  }
-  .main-nav {
-    max-height: calc(100dvh - 72px);
-  }
-  #inquiry-preview {
-    font-size: 16px;
-  }
-}
-.hero-description {
-  font-size: 15px;
-  max-width: 410px;
-}
-.service-content,
-.faq-list details > p,
-.about-copy > p:not(.section-kicker):not(.about-lead) {
-  font-size: 14px;
-}
-.process-grid p,
-.section-heading > p {
-  font-size: 13px;
-}
-@media (max-width: 699px) {
-  body {
-    padding-bottom: calc(67px + env(safe-area-inset-bottom));
-  }
-  .hero-description {
-    font-size: 13px;
-    max-width: 350px;
-  }
-  .hero-visual {
-    -webkit-mask-image: linear-gradient(
-      180deg,
-      transparent,
-      #000 26%,
-      #000 85%,
-      transparent
-    );
-    mask-image: linear-gradient(
-      180deg,
-      transparent,
-      #000 26%,
-      #000 85%,
-      transparent
-    );
-  }
-  .service-content,
-  .faq-list details > p,
-  .about-copy > p:not(.section-kicker):not(.about-lead) {
-    font-size: 13px;
-  }
-  .process-grid p {
-    font-size: 12px;
-  }
-}
-@media (max-width: 999px) {
-  .guide-panel {
-    gap: 36px;
-    padding: 36px;
-    grid-template-columns: 0.85fr 1.15fr;
-  }
-  .guide-choices {
-    grid-template-columns: 1fr;
-  }
-  .guide-choice {
-    grid-template-columns: 26px minmax(0, 1fr) 18px;
-    align-items: center;
-    align-content: center;
-    min-height: 76px;
-    gap: 14px;
-    padding: 18px;
-  }
-  .guide-choice > .icon:first-child {
-    grid-column: auto;
-  }
-  .guide-choice > span,
-  .guide-choice .guide-choice-arrow {
-    align-self: center;
-  }
-  .guide-choice .guide-choice-arrow {
-    margin-bottom: 0;
-  }
-}
-@media (max-width: 699px) {
-  .guide-panel {
-    grid-template-columns: 1fr;
-    gap: 28px;
-    padding: 28px 22px;
-  }
-  .guide-intro h2 {
-    max-width: 300px;
-    font-size: 44px;
-  }
-  .guide-kicker {
-    margin-bottom: 14px;
-  }
-  .guide-description {
-    margin-top: 18px;
-    font-size: 13px;
-  }
-  .guide-phone {
-    margin-top: 20px;
-  }
-  .guide-interaction {
-    padding-top: 25px;
-    border-top: 1px solid #50544c;
-  }
-  .guide-choice {
-    padding: 16px 14px;
-  }
-  .guide-choice > span {
-    font-size: 12px;
-  }
-  .guide-fieldset legend {
-    font-size: 17px;
-  }
-  .guide-panel .guide-answer {
-    padding: 12px;
-  }
-  .guide-continue {
-    width: 100%;
-    gap: 16px;
-    padding-inline: 18px;
-  }
-}
+/* Accessibility: reduced motion */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
