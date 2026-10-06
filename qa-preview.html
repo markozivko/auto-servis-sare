@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="hr">
+  <meta charset="utf-8" />
+  <title>Šare — provjera responzivnosti</title>
+  <style>
+    body {
+      margin: 24px;
+      font: 14px system-ui;
+      background: #d9ddd6;
+      color: #172018;
+    }
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin: 18px 0;
+      flex-wrap: wrap;
+    }
+    button {
+      padding: 12px 18px;
+      cursor: pointer;
+    }
+    iframe {
+      border: 0;
+      background: #fff;
+      height: 850px;
+      display: block;
+      box-shadow: 0 8px 40px #0002;
+    }
+    pre {
+      white-space: pre-wrap;
+      line-height: 1.7;
+    }
+  </style>
+  <h1>Lokalna provjera prikaza</h1>
+  <p>
+    Stvarna stranica unutar mobilne, tabletne ili desktop širine. Testni podaci
+    ne šalju se servisu.
+  </p>
+  <pre id="results" role="status">Provjeravam širine i resurse…</pre>
+  <div class="toolbar">
+    <button data-width="320">320 px</button
+    ><button data-width="390">390 px</button
+    ><button data-width="768">768 px</button
+    ><button data-width="1440">1440 px</button
+    ><button id="check-form">Provjeri obrazac bez slanja</button>
+  </div>
+  <iframe
+    id="preview"
+    src="index.html"
+    title="Pregled stranice Šare"
+    style="width: 390px"
+  ></iframe>
+  <script>
+    const preview = document.querySelector("#preview");
+    const output = document.querySelector("#results");
+    const frameReady = () => new Promise((resolve) => setTimeout(resolve, 100));
+    preview.addEventListener("load", async () => {
+      const doc = preview.contentDocument;
+      await doc.fonts.ready;
+      const results = [];
+      for (const width of [320, 375, 390, 768, 1000, 1024, 1440, 1920]) {
+        preview.style.width = width + "px";
+        await frameReady();
+        const actual = doc.documentElement.clientWidth;
+        const overflow = doc.documentElement.scrollWidth > actual;
+        const bad = [...doc.querySelectorAll("main *, header *, footer *")]
+          .filter((el) => {
+            const r = el.getBoundingClientRect();
+            return (
+              r.width &&
+              (r.right > actual + 1 || r.left < -1) &&
+              preview.contentWindow.getComputedStyle(el).position !== "absolute"
+            );
+          })
+          .map((el) => el.tagName + "." + el.className)
+          .slice(0, 6);
+        results.push(
+          `${width}px: ${overflow ? "FAIL horizontal overflow" : "PASS bez horizontalnog prelijevanja"}${bad.length ? " | pregledati: " + bad.join(", ") : ""}`,
+        );
+      }
+      const broken = [...doc.images].filter(
+        (img) => img.complete && !img.naturalWidth,
+      );
+      results.push("Slike: " + (broken.length ? "FAIL" : "PASS"));
+      results.push(
+        "Fontovi: " +
+          (doc.fonts.check('700 16px "Barlow Condensed"') &&
+          doc.fonts.check("400 16px Manrope")
+            ? "PASS"
+            : "FAIL"),
+      );
+      output.textContent = results.join("\n");
+      preview.style.width = "390px";
+      preview.contentWindow.scrollTo(0, 0);
+    });
+    document
+      .querySelectorAll("[data-width]")
+      .forEach((button) =>
+        button.addEventListener(
+          "click",
+          () => (preview.style.width = button.dataset.width + "px"),
+        ),
+      );
+    document.querySelector("#check-form").addEventListener("click", () => {
+      const doc = preview.contentDocument;
+      const form = doc.querySelector("#booking-form");
+      doc.querySelector('[data-booking][data-service="Klima"]').click();
+      const selected = form.elements.service.value === "Klima";
+      form.elements.name.value = "  Test Korisnik  ";
+      form.elements.email.value = "\u00a0test@example.com\u00a0";
+      form.elements.vehicle.value = "Opel Astra";
+      form.elements.message.value = "Provjera prikaza poruke: čćžšđ & upit?";
+      form.requestSubmit();
+      const link = doc.querySelector("#email-draft").getAttribute("href");
+      const pass =
+        !doc.querySelector("#booking-result").hidden &&
+        selected &&
+        decodeURIComponent(link).includes("čćžšđ & upit?") &&
+        form.elements.name.value === "Test Korisnik";
+      output.textContent +=
+        "\nObrazac: " +
+        (pass
+          ? "PASS odabir usluge, trim, hrvatski znakovi, pregled i mailto nacrt"
+          : "FAIL");
+      doc.querySelector("#edit-inquiry").click();
+      output.textContent +=
+        "\nUređivanje nacrta: " +
+        (!form.hidden && form.elements.vehicle.value === "Opel Astra"
+          ? "PASS"
+          : "FAIL");
+      form.elements.message.value = "   ";
+      form.requestSubmit();
+      output.textContent +=
+        "\nPrazna poruka: " +
+        (!form.hidden && !form.checkValidity() ? "PASS odbijena" : "FAIL");
+      form.reset();
+      [...form.elements].forEach((el) => el.setCustomValidity?.(""));
+      doc.querySelector("#booking-dialog").close();
+    });
+  </script>
+</html>
