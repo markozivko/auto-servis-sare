@@ -12,6 +12,7 @@ Stranica sadrži:
 
 - Naslovnu sekciju s pozivom na dogovor servisa.
 - Pregled šest kategorija usluga s proširivim opisima.
+- Interaktivni vodič „Što treba vašem autu?” koji priprema opis upita.
 - Cjenik pripremljen za naknadni unos iznosa.
 - Predstavljanje servisa i korake za dogovor dolaska.
 - Česta pitanja, kontaktne podatke i radno vrijeme.
@@ -42,16 +43,16 @@ Zatim pokrenite lokalni poslužitelj prethodnom naredbom. Nisu potrebni `npm ins
 
 ## Struktura projekta
 
-| Datoteka ili folder                  | Namjena                                                                                  |
-| ------------------------------------ | ---------------------------------------------------------------------------------------- |
-| [`index.html`](index.html)           | Hrvatski sadržaj, cjenik, karta, obrazac i dijalozi.                                     |
-| [`en/index.html`](en/index.html)     | Engleski sadržaj, cjenik, karta, obrazac i dijalozi.                                     |
-| [`styles.css`](styles.css)           | Zajedničke boje, tipografija, raspored i responzivni prikaz za oba jezika.               |
-| [`app.js`](app.js)                   | Zajednički mobilni izbornik, dijalozi, HR/EN poruke, validacija i priprema e-mail upita. |
-| [`assets/`](assets/)                 | Fotografije, ikona stranice, lokalni fontovi i njihove licence.                          |
-| [`qa-preview.html`](qa-preview.html) | Razvojni alat za provjeru širina prikaza i ponašanja obrasca na oba jezika.              |
-| [`.gitignore`](.gitignore)           | Pravila za izostavljanje lokalnih i pomoćnih datoteka iz Gita.                           |
-| [`README.md`](README.md)             | Upute za pokretanje, održavanje i objavu.                                                |
+| Datoteka ili folder                  | Namjena                                                                                         |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| [`index.html`](index.html)           | Hrvatski sadržaj, cjenik, karta, obrazac i dijalozi.                                            |
+| [`en/index.html`](en/index.html)     | Engleski sadržaj, cjenik, karta, obrazac i dijalozi.                                            |
+| [`styles.css`](styles.css)           | Zajedničke boje, tipografija, raspored i responzivni prikaz za oba jezika.                      |
+| [`app.js`](app.js)                   | Zajednički mobilni izbornik, vodič, dijalozi, HR/EN poruke, validacija i priprema e-mail upita. |
+| [`assets/`](assets/)                 | Fotografije, ikona stranice, lokalni fontovi i njihove licence.                                 |
+| [`qa-preview.html`](qa-preview.html) | Razvojni alat za provjeru širina prikaza, obrasca i vodiča na oba jezika.                       |
+| [`.gitignore`](.gitignore)           | Pravila za izostavljanje lokalnih i pomoćnih datoteka iz Gita.                                  |
+| [`README.md`](README.md)             | Upute za pokretanje, održavanje i objavu.                                                       |
 
 ## Jezici i prijevodi
 
@@ -72,6 +73,27 @@ Vrijednosti usluga u atributima `data-service` i `value` ostaju iste na oba jezi
 Ako otvaranje e-mail aplikacije nije postavljeno, korisnik može kopirati tekst u svoj e-mail. Ako automatsko kopiranje nije dostupno, tekst se označava za ručno kopiranje.
 
 Obrazac nema backend, bazu podataka ni povezivanje s kalendarom. Podatke ne sprema u `localStorage` i ne šalje ih poslužitelju stranice. Za izravno slanje s weba potrebno je naknadno povezati servis za slanje e-pošte ili backend.
+
+## Vodič „Što treba vašem autu?”
+
+Vodič u sekciji `#vodic` pomaže posjetitelju odabrati uslugu i opisati razlog dolaska:
+
+1. Korisnik odabire jednu od četiri situacije: klima slabo hladi, priprema za tehnički, redovni servis ili nije siguran.
+2. Odgovara na jedno dodatno pitanje i odmah vidi tekst koji će se dodati u upit. Gumb **„Promijeni situaciju”** vraća ga na početak.
+3. **„Nastavi na upit”** otvara postojeći obrazac s odabranom uslugom i pripremljenim opisom. Korisnik ga može dopuniti prije pripreme e-maila.
+
+Vodič zadržava već uneseno ime, kontakt, vozilo i vlastiti opis. Ponovljeni prijenos istog odgovora ne dodaje isti sažetak dvaput. Novi odabir zamjenjuje prethodni neizmijenjeni automatski sažetak. Ako je korisnik taj sažetak ručno izmijenio, vodič prije nastavka nudi izbor: zadržati postojeći opis ili cijeli opis zamijeniti novim sažetkom. Time se izbjegava dodavanje proturječnih opisa. Ako opis i novi sažetak zajedno prelaze ograničenje polja, vodič prikazuje poruku bez promjene postojećeg upita.
+
+Vodič usmjerava prema servisnoj usluzi; ne postavlja dijagnozu, ne procjenjuje cijenu i ne rezervira termin. Slanje ostaje isto: korisnik pregledava nacrt i sam šalje e-mail iz svoje aplikacije. Nema dodatnog servisa, baze podataka ili vanjskih zahtjeva za rad vodiča. Vodič i njegove poveznice prikazuju se nakon učitavanja JavaScripta.
+
+Naslovi kartica, uvod i gumbi prevode se u `index.html` i `en/index.html`. Dodatna pitanja, odgovori, automatski opisi i poruke uređuju se u `translations.hr.guide` i `translations.en.guide` u `app.js`. Oba jezika treba održavati zajedno. Ključevi situacija u `data-guide-situation` moraju odgovarati ključevima u `guide.situations`; vrijednost `service` mora odgovarati postojećoj opciji obrasca. Trenutačno se koriste:
+
+| Situacija     | Vrijednost usluge  |
+| ------------- | ------------------ |
+| `climate`     | `air-conditioning` |
+| `inspection`  | `inspection`       |
+| `maintenance` | `mechanics`        |
+| `unsure`      | `other`            |
 
 ## Uređivanje sadržaja
 
@@ -124,7 +146,7 @@ Primijenjene dizajnerske smjernice: [Anthropic frontend-design](https://github.c
 
 Uz pokrenut lokalni poslužitelj otvorite [qa-preview.html](http://127.0.0.1:8000/qa-preview.html). Izbornik **„Jezik pregleda”** otvara hrvatsku ili englesku stranicu. Alat provjerava horizontalno prelijevanje na širinama **320, 375, 390, 768, 1000, 1024, 1440 i 1920 px**, oznaku jezika dokumenta te učitavanje fontova i slika. Gumbi sa širinama služe za ručni pregled.
 
-Gumb **„Provjeri oba jezika i obrasce”** redom provjerava obje verzije i zadržava rezultate odvojeno za HR i EN. **„Provjeri trenutačni obrazac”** provjerava samo trenutačno otvoreni jezik. Provjera obrasca koristi izmišljene podatke i obuhvaća:
+Gumb **„Provjeri oba jezika, obrasce i vodič”** redom provjerava obje verzije i zadržava rezultate odvojeno za HR i EN. **„Provjeri trenutačni obrazac i vodič”** provjerava samo trenutačno otvoreni jezik. Provjera obrasca koristi izmišljene podatke i obuhvaća:
 
 - Odabir svih sedam usluga preko gumba na stranici.
 - Obavezna polja i neispravnu e-mail adresu, uz poruke na odabranom jeziku.
@@ -132,7 +154,9 @@ Gumb **„Provjeri oba jezika i obrasce”** redom provjerava obje verzije i zad
 - Uklanjanje rubnih razmaka i očuvanje izvornog korisničkog teksta, hrvatskih znakova i prijeloma redaka.
 - Uređivanje nacrta i odbijanje poruke koja sadrži samo razmake.
 
-Alat ne otvara e-mail aplikaciju, ne šalje e-poštu i ne kopira tekst u međuspremnik. Ručno na oba jezika provjerite mobilni izbornik, čitljivost cjenika, Google kartu, poveznice, prebacivanje jezika iz pojedine sekcije, poruku nakon kopiranja i zatvaranje dijaloga tipkom `Escape`. Razvojni pregled ne zamjenjuje provjeru na stvarnom telefonu. Nakon budućih izmjena provjere treba ponoviti.
+Provjera vodiča obuhvaća sve četiri situacije i sve ponuđene odgovore, obavezan odabir odgovora, povratak i fokus tipkovnice, prijevode i odabranu uslugu, očuvanje vlastitog unosa, uklanjanje starih pogrešaka, ponovljene prijenose i promjenu situacije. Provjerava obje odluke kada je prethodni sažetak ručno izmijenjen, ponovno otvaranje obrasca nakon nacrta, zaštitu od predugačkog opisa te drugi korak vodiča na širinama **320, 390, 768 i 1440 px**. Nakon provjere brišu se testni unosi iz obrasca.
+
+Alat ne otvara e-mail aplikaciju, ne šalje e-poštu i ne kopira tekst u međuspremnik. Ručno na oba jezika provjerite mobilni izbornik, čitljivost cjenika, Google kartu, poveznice, prebacivanje jezika iz pojedine sekcije, prolaz vodičem samo tipkovnicom, poruku nakon kopiranja i zatvaranje dijaloga tipkom `Escape`. Razvojni pregled ne zamjenjuje provjeru na stvarnom telefonu. Nakon budućih izmjena provjere treba ponoviti.
 
 ## Rad s GitHubom
 

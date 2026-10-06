@@ -51,8 +51,8 @@
       <option value="hr">HR — Hrvatski</option>
       <option value="en">EN — English</option>
     </select>
-    <button id="check-all">Provjeri oba jezika i obrasce</button>
-    <button id="check-form">Provjeri trenutačni obrazac</button>
+    <button id="check-all">Provjeri oba jezika, obrasce i vodič</button>
+    <button id="check-form">Provjeri trenutačni obrazac i vodič</button>
     <button data-width="320">320 px</button>
     <button data-width="390">390 px</button>
     <button data-width="768">768 px</button>
@@ -352,6 +352,312 @@
       }
     }
 
+    async function checkGuide(lang, doc) {
+      status.textContent = "Provjera vodiča: " + labels[lang];
+      const guide = doc.querySelector("#vodic");
+      const choices = doc.querySelector("#guide-choices");
+      const details = doc.querySelector("#guide-details");
+      const guideForm = doc.querySelector("#guide-form");
+      const guidePreview = doc.querySelector("#guide-preview");
+      const summary = doc.querySelector("#guide-summary");
+      const back = doc.querySelector("#guide-back");
+      const booking = doc.querySelector("#booking-form");
+      const dialog = doc.querySelector("#booking-dialog");
+      const result = doc.querySelector("#booking-result");
+      const field = (name) => booking.elements.namedItem(name);
+      const scenarios = {
+        climate: [
+          "air-conditioning",
+          lang === "hr" ? /klim/i : /air.?conditioning|cool/i,
+        ],
+        inspection: [
+          "inspection",
+          lang === "hr" ? /tehnič/i : /roadworthiness|inspect/i,
+        ],
+        maintenance: [
+          "mechanics",
+          lang === "hr" ? /servis/i : /servic|maintenance/i,
+        ],
+        unsure: [
+          "other",
+          lang === "hr" ? /sigur|pomoć|provjer/i : /sure|help|check/i,
+        ],
+      };
+      const set = (name, value) => {
+        field(name).value = value;
+        field(name).dispatchEvent(
+          new preview.contentWindow.Event("input", { bubbles: true }),
+        );
+      };
+      const choose = (situation) => {
+        if (choices.hidden) back.click();
+        const button = doc.querySelector(
+          `[data-guide-situation="${situation}"]`,
+        );
+        button.click();
+        return button;
+      };
+      const answer = (value = "0") => {
+        doc.querySelector(`#guide-answers input[value="${value}"]`).click();
+        return summary.textContent.trim();
+      };
+      const reset = () => {
+        if (!result.hidden) doc.querySelector("#edit-inquiry").click();
+        dialog.close();
+        booking.reset();
+        [...booking.elements].forEach((el) => el.setCustomValidity?.(""));
+        if (choices.hidden) back.click();
+      };
+      const occurrences = (text, part) => text.split(part).length - 1;
+      const originalWidth = preview.style.width;
+
+      record(
+        lang,
+        Boolean(guide && !guide.hidden && guideForm && choices && details),
+        "vodič dostupan nakon učitavanja JavaScripta",
+      );
+      if (!guide || !guideForm || !choices || !details) return;
+
+      try {
+        reset();
+        const firstChoice = choose("climate");
+        record(
+          lang,
+          choices.hidden &&
+            !details.hidden &&
+            doc.activeElement === doc.querySelector("#guide-question"),
+          "odabir situacije otvara pitanje i premješta fokus",
+        );
+        guideForm.requestSubmit();
+        record(
+          lang,
+          !guideForm.checkValidity() &&
+            !dialog.open &&
+            guidePreview.hidden &&
+            field("message").value === "",
+          "vodič zahtijeva odgovor prije prijenosa u obrazac",
+        );
+        answer();
+        back.click();
+        record(
+          lang,
+          !choices.hidden &&
+            details.hidden &&
+            doc.activeElement === firstChoice,
+          "povratak na situacije vraća fokus na odabranu karticu",
+        );
+        choose("climate");
+        record(
+          lang,
+          !doc.querySelector("#guide-answers input:checked") &&
+            guidePreview.hidden,
+          "novi odabir situacije briše prethodni odgovor i sažetak",
+        );
+
+        for (const [situation, [service, translated]] of Object.entries(
+          scenarios,
+        )) {
+          reset();
+          choose(situation);
+          const values = [
+            ...doc.querySelectorAll('#guide-answers input[type="radio"]'),
+          ].map((input) => input.value);
+          record(lang, values.length > 1, `vodič nudi odgovore: ${situation}`);
+          for (const value of values) {
+            reset();
+            choose(situation);
+            const text = answer(value);
+            guideForm.requestSubmit();
+            record(
+              lang,
+              text.length > 0 &&
+                translated.test(text) &&
+                !guidePreview.hidden &&
+                dialog.open &&
+                !booking.hidden &&
+                result.hidden &&
+                field("service").value === service &&
+                field("message").value === text,
+              `vodič prenosi prevedeni sažetak i uslugu: ${situation}, odgovor ${value}`,
+            );
+          }
+        }
+
+        reset();
+        const existing = {
+          name: "Test Korisnik",
+          email: "test@example.com",
+          phone: "+385 99 123 4567",
+          vehicle: "Opel Astra",
+        };
+        Object.entries(existing).forEach(([name, value]) => set(name, value));
+        const manual =
+          "Moj postojeći opis: čćžšđ.\nPlease preserve these details.";
+        set("message", manual);
+        set("service", "diagnostics");
+        field("service").setCustomValidity("Stara testna pogreška");
+        field("message").setCustomValidity("Stara testna pogreška");
+        choose("climate");
+        const firstSummary = answer();
+        guideForm.requestSubmit();
+        const firstMessage = field("message").value;
+        record(
+          lang,
+          dialog.open &&
+            Object.entries(existing).every(
+              ([name, value]) => field(name).value === value,
+            ) &&
+            firstMessage.includes(manual) &&
+            occurrences(firstMessage, firstSummary) === 1 &&
+            !field("service").validity.customError &&
+            !field("message").validity.customError,
+          "vodič čuva kontakt, vozilo i vlastiti opis te uklanja stare pogreške prenesenih polja",
+        );
+        dialog.close();
+        guideForm.requestSubmit();
+        record(
+          lang,
+          dialog.open && field("message").value === firstMessage,
+          "ponovljeni prijenos istog odgovora ne duplicira sažetak",
+        );
+        dialog.close();
+        choose("inspection");
+        const secondSummary = answer();
+        guideForm.requestSubmit();
+        record(
+          lang,
+          field("message").value.includes(manual) &&
+            !field("message").value.includes(firstSummary) &&
+            occurrences(field("message").value, secondSummary) === 1 &&
+            field("service").value === "inspection",
+          "promjena situacije zamjenjuje prethodni sažetak i čuva vlastiti opis",
+        );
+
+        const middle = Math.floor(secondSummary.length / 2);
+        const editedSummary =
+          secondSummary.slice(0, middle) +
+          " [moj dodatak] " +
+          secondSummary.slice(middle);
+        const editedMessage = field("message").value.replace(
+          secondSummary,
+          editedSummary,
+        );
+        set("message", editedMessage);
+        dialog.close();
+        choose("maintenance");
+        answer();
+        guideForm.requestSubmit();
+        const reuse = doc.querySelector("#guide-reuse");
+        record(
+          lang,
+          !dialog.open &&
+            field("message").value === editedMessage &&
+            field("service").value === "inspection" &&
+            !reuse.hidden &&
+            doc.activeElement === doc.querySelector("#guide-reuse-title"),
+          "izmijenjeni prethodni sažetak traži odluku bez promjene upita",
+        );
+        reuse.querySelector('[value="keep"]').click();
+        guideForm.requestSubmit();
+        record(
+          lang,
+          dialog.open &&
+            field("message").value === editedMessage &&
+            field("service").value === "mechanics",
+          "odabir zadržavanja čuva točan postojeći opis bez dodavanja drugog sažetka",
+        );
+        booking.requestSubmit();
+        record(
+          lang,
+          booking.hidden && !result.hidden,
+          "upit iz vodiča može pripremiti nacrt",
+        );
+        dialog.close();
+        guideForm.requestSubmit();
+        record(
+          lang,
+          dialog.open && !booking.hidden && result.hidden,
+          "ponovni prijenos iz vodiča nakon nacrta vraća obrazac za uređivanje",
+        );
+
+        reset();
+        set("message", manual);
+        choose("climate");
+        const originalSummary = answer();
+        guideForm.requestSubmit();
+        set(
+          "message",
+          manual + "\n\n" + originalSummary.replace(".", " (moj dodatak)."),
+        );
+        dialog.close();
+        choose("inspection");
+        const replacement = answer();
+        guideForm.requestSubmit();
+        reuse.querySelector('[value="replace"]').click();
+        guideForm.requestSubmit();
+        record(
+          lang,
+          dialog.open &&
+            field("message").value === replacement &&
+            field("service").value === "inspection",
+          "izričit odabir zamjene koristi samo novi sažetak",
+        );
+
+        reset();
+        const limit = field("message").maxLength;
+        const longMessage = "x".repeat(Math.max(limit, 1));
+        set("message", longMessage);
+        set("service", "tyres");
+        choose("unsure");
+        answer();
+        guideForm.requestSubmit();
+        const error = doc.querySelector("#guide-error");
+        record(
+          lang,
+          limit > 0 &&
+            !dialog.open &&
+            field("message").value === longMessage &&
+            field("service").value === "tyres" &&
+            error &&
+            !error.hidden &&
+            error.textContent.trim().length > 0,
+          "predugačak ukupni opis zaustavlja prijenos bez djelomičnih izmjena",
+        );
+
+        reset();
+        for (const situation of Object.keys(scenarios)) {
+          choose(situation);
+          const inputs = [
+            ...doc.querySelectorAll('#guide-answers input[type="radio"]'),
+          ];
+          answer(inputs[inputs.length - 1].value);
+          for (const width of [320, 390, 768, 1440]) {
+            preview.style.width = width + "px";
+            await frameReady();
+            const actual = doc.documentElement.clientWidth;
+            const withinViewport = [...details.querySelectorAll("*")].every(
+              (el) => {
+                const bounds = el.getBoundingClientRect();
+                return (
+                  !bounds.width ||
+                  (bounds.left >= -1 && bounds.right <= actual + 1)
+                );
+              },
+            );
+            record(
+              lang,
+              doc.documentElement.scrollWidth <= actual && withinViewport,
+              `vodič s odgovorom bez prelijevanja: ${situation}, ${width}px`,
+            );
+          }
+        }
+      } finally {
+        reset();
+        preview.style.width = originalWidth;
+        preview.contentWindow.scrollTo(0, 0);
+      }
+    }
+
     language.addEventListener("change", () =>
       runChecks(async () => {
         const lang = language.value;
@@ -367,12 +673,14 @@
           const doc = await loadPage(lang);
           await checkResponsive(lang, doc);
           checkForm(lang, doc);
+          await checkGuide(lang, doc);
         }
       }),
     );
     document.querySelector("#check-form").addEventListener("click", () =>
       runChecks(async () => {
         checkForm(language.value, preview.contentDocument);
+        await checkGuide(language.value, preview.contentDocument);
       }),
     );
     document.querySelectorAll("[data-width]").forEach((button) => {

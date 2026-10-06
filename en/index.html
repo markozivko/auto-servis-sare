@@ -454,13 +454,161 @@
           </div>
           <div class="services-note">
             <span>Not sure what your car needs?</span
-            ><a href="tel:+38513700174"
+            ><a href="#vodic" data-guide-link hidden
+              >Find a service in two steps<svg class="icon" aria-hidden="true">
+                <use href="#i-arrow" /></svg></a
+            ><a href="tel:+38513700174" data-guide-fallback
               >Tell us about the problem. We’re here to help.<svg
                 class="icon"
                 aria-hidden="true"
               >
                 <use href="#i-arrow" /></svg
             ></a>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="section guide-section"
+        id="vodic"
+        aria-labelledby="guide-title"
+        hidden
+      >
+        <div class="container">
+          <div class="guide-panel">
+            <div class="guide-intro">
+              <p class="guide-kicker">Quick service guide</p>
+              <h2 id="guide-title">What does your car need?</h2>
+              <p class="guide-description">
+                You don’t need to know the service name. Tell us what you need
+                in two short steps and prepare an enquiry for our team.
+              </p>
+              <a class="guide-phone" href="tel:+38513700174">
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-phone" />
+                </svg>
+                <span>Prefer to talk?<strong>+385 1 3700 174</strong></span>
+              </a>
+            </div>
+            <div class="guide-interaction">
+              <p class="guide-progress" id="guide-progress" aria-live="polite">
+                Step 1 of 2 · Choose your situation
+              </p>
+              <div class="guide-choices" id="guide-choices">
+                <button
+                  class="guide-choice"
+                  type="button"
+                  data-guide-situation="climate"
+                >
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-snow" />
+                  </svg>
+                  <span>The air conditioning isn’t cooling well</span>
+                  <svg class="icon guide-choice-arrow" aria-hidden="true">
+                    <use href="#i-arrow" />
+                  </svg>
+                </button>
+                <button
+                  class="guide-choice"
+                  type="button"
+                  data-guide-situation="inspection"
+                >
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-shield" />
+                  </svg>
+                  <span>I’m preparing for a roadworthiness test</span>
+                  <svg class="icon guide-choice-arrow" aria-hidden="true">
+                    <use href="#i-arrow" />
+                  </svg>
+                </button>
+                <button
+                  class="guide-choice"
+                  type="button"
+                  data-guide-situation="maintenance"
+                >
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-wrench" />
+                  </svg>
+                  <span>It’s time for a regular service</span>
+                  <svg class="icon guide-choice-arrow" aria-hidden="true">
+                    <use href="#i-arrow" />
+                  </svg>
+                </button>
+                <button
+                  class="guide-choice"
+                  type="button"
+                  data-guide-situation="unsure"
+                >
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-diagnostic" />
+                  </svg>
+                  <span>I’m not sure</span>
+                  <svg class="icon guide-choice-arrow" aria-hidden="true">
+                    <use href="#i-arrow" />
+                  </svg>
+                </button>
+              </div>
+              <div id="guide-details" hidden>
+                <button class="guide-back" id="guide-back" type="button">
+                  <span aria-hidden="true">←</span> Change situation
+                </button>
+                <p class="guide-selection" id="guide-selection"></p>
+                <form id="guide-form">
+                  <fieldset class="guide-fieldset">
+                    <legend id="guide-question" tabindex="-1"></legend>
+                    <div class="guide-answers" id="guide-answers"></div>
+                  </fieldset>
+                  <div class="guide-preview" id="guide-preview" hidden>
+                    <p class="guide-preview-label">In your enquiry</p>
+                    <p id="guide-summary"></p>
+                  </div>
+                  <fieldset
+                    class="guide-reuse"
+                    id="guide-reuse"
+                    hidden
+                    disabled
+                  >
+                    <legend id="guide-reuse-title" tabindex="-1">
+                      You have edited your enquiry message. Which version would
+                      you like to use?
+                    </legend>
+                    <label class="guide-answer">
+                      <input
+                        type="radio"
+                        name="guide-reuse"
+                        value="keep"
+                        required
+                      />
+                      <span>Keep my existing message</span>
+                    </label>
+                    <label class="guide-answer">
+                      <input
+                        type="radio"
+                        name="guide-reuse"
+                        value="replace"
+                        required
+                      />
+                      <span
+                        >Replace my entire message with the new summary</span
+                      >
+                    </label>
+                  </fieldset>
+                  <p class="guide-error" id="guide-error" role="alert"></p>
+                  <button
+                    class="button button-yellow guide-continue"
+                    type="submit"
+                  >
+                    Continue to enquiry
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-up-right" />
+                    </svg>
+                  </button>
+                  <p class="guide-note">
+                    You can review and edit your enquiry before sending it.
+                  </p>
+                </form>
+              </div>
+            </div>
           </div>
         </div>
       </section>

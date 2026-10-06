@@ -460,13 +460,163 @@
           </div>
           <div class="services-note">
             <span>Niste sigurni što vašem automobilu treba?</span
-            ><a href="tel:+38513700174"
+            ><a href="#vodic" data-guide-link hidden
+              >Pronađite uslugu u dva koraka<svg
+                class="icon"
+                aria-hidden="true"
+              >
+                <use href="#i-arrow" /></svg></a
+            ><a href="tel:+38513700174" data-guide-fallback
               >Opišite nam problem. Tu smo da pomognemo.<svg
                 class="icon"
                 aria-hidden="true"
               >
                 <use href="#i-arrow" /></svg
             ></a>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="section guide-section"
+        id="vodic"
+        aria-labelledby="guide-title"
+        hidden
+      >
+        <div class="container">
+          <div class="guide-panel">
+            <div class="guide-intro">
+              <p class="guide-kicker">Brzi vodič kroz usluge</p>
+              <h2 id="guide-title">Što treba vašem autu?</h2>
+              <p class="guide-description">
+                Ne morate znati naziv usluge. U dva kratka koraka opišite što
+                trebate i pripremite upit našem servisu.
+              </p>
+              <a class="guide-phone" href="tel:+38513700174">
+                <svg class="icon" aria-hidden="true">
+                  <use href="#i-phone" />
+                </svg>
+                <span
+                  >Radije biste razgovarali?<strong>01 3700 174</strong></span
+                >
+              </a>
+            </div>
+            <div class="guide-interaction">
+              <p class="guide-progress" id="guide-progress" aria-live="polite">
+                Korak 1 od 2 · Odaberite situaciju
+              </p>
+              <div class="guide-choices" id="guide-choices">
+                <button
+                  class="guide-choice"
+                  type="button"
+                  data-guide-situation="climate"
+                >
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-snow" />
+                  </svg>
+                  <span>Klima slabo hladi</span>
+                  <svg class="icon guide-choice-arrow" aria-hidden="true">
+                    <use href="#i-arrow" />
+                  </svg>
+                </button>
+                <button
+                  class="guide-choice"
+                  type="button"
+                  data-guide-situation="inspection"
+                >
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-shield" />
+                  </svg>
+                  <span>Pripremam se za tehnički</span>
+                  <svg class="icon guide-choice-arrow" aria-hidden="true">
+                    <use href="#i-arrow" />
+                  </svg>
+                </button>
+                <button
+                  class="guide-choice"
+                  type="button"
+                  data-guide-situation="maintenance"
+                >
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-wrench" />
+                  </svg>
+                  <span>Vrijeme je za redovni servis</span>
+                  <svg class="icon guide-choice-arrow" aria-hidden="true">
+                    <use href="#i-arrow" />
+                  </svg>
+                </button>
+                <button
+                  class="guide-choice"
+                  type="button"
+                  data-guide-situation="unsure"
+                >
+                  <svg class="icon" aria-hidden="true">
+                    <use href="#i-diagnostic" />
+                  </svg>
+                  <span>Nisam siguran</span>
+                  <svg class="icon guide-choice-arrow" aria-hidden="true">
+                    <use href="#i-arrow" />
+                  </svg>
+                </button>
+              </div>
+              <div id="guide-details" hidden>
+                <button class="guide-back" id="guide-back" type="button">
+                  <span aria-hidden="true">←</span> Promijeni situaciju
+                </button>
+                <p class="guide-selection" id="guide-selection"></p>
+                <form id="guide-form">
+                  <fieldset class="guide-fieldset">
+                    <legend id="guide-question" tabindex="-1"></legend>
+                    <div class="guide-answers" id="guide-answers"></div>
+                  </fieldset>
+                  <div class="guide-preview" id="guide-preview" hidden>
+                    <p class="guide-preview-label">U vašem upitu</p>
+                    <p id="guide-summary"></p>
+                  </div>
+                  <fieldset
+                    class="guide-reuse"
+                    id="guide-reuse"
+                    hidden
+                    disabled
+                  >
+                    <legend id="guide-reuse-title" tabindex="-1">
+                      Već ste uredili opis u obrascu. Koji želite koristiti?
+                    </legend>
+                    <label class="guide-answer">
+                      <input
+                        type="radio"
+                        name="guide-reuse"
+                        value="keep"
+                        required
+                      />
+                      <span>Zadrži moj postojeći opis</span>
+                    </label>
+                    <label class="guide-answer">
+                      <input
+                        type="radio"
+                        name="guide-reuse"
+                        value="replace"
+                        required
+                      />
+                      <span>Zamijeni cijeli opis novim sažetkom</span>
+                    </label>
+                  </fieldset>
+                  <p class="guide-error" id="guide-error" role="alert"></p>
+                  <button
+                    class="button button-yellow guide-continue"
+                    type="submit"
+                  >
+                    Nastavi na upit
+                    <svg class="icon" aria-hidden="true">
+                      <use href="#i-up-right" />
+                    </svg>
+                  </button>
+                  <p class="guide-note">
+                    Prije slanja možete pregledati i dopuniti upit.
+                  </p>
+                </form>
+              </div>
+            </div>
           </div>
         </div>
       </section>

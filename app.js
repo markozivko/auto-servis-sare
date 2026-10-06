@@ -15,6 +15,76 @@
       copied: "Tekst upita je kopiran.",
       copyUnavailable:
         "Automatsko kopiranje nije dostupno. Označeni tekst kopirajte naredbom Kopiraj.",
+      guide: {
+        firstStep: "Korak 1 od 2 · Odaberite situaciju",
+        secondStep: "Korak 2 od 2 · Još jedan detalj",
+        tooLong:
+          "Vaš postojeći opis i odabrani detalji zajedno su predugi. Skratite opis u obrascu za upit pa pokušajte ponovno.",
+        situations: {
+          climate: {
+            title: "Klima slabo hladi",
+            service: "air-conditioning",
+            question: "Kada primjećujete poteškoću?",
+            description: "Klima u mom vozilu slabo hladi.",
+            answers: [
+              ["Stalno", "Poteškoća se pojavljuje stalno."],
+              ["Povremeno", "Poteškoća se pojavljuje povremeno."],
+              ["Nisam siguran", "Nisam siguran kada se poteškoća pojavljuje."],
+            ],
+          },
+          inspection: {
+            title: "Pripremam se za tehnički",
+            service: "inspection",
+            question: "Što biste željeli provjeriti?",
+            description: "Želim pripremiti vozilo za tehnički pregled.",
+            answers: [
+              ["Opće stanje vozila", "Zanima me kontrolni pregled vozila."],
+              [
+                "Nešto sam već primijetio",
+                "Primijetio sam poteškoću koju ću opisati u upitu.",
+              ],
+              [
+                "Trebam savjet",
+                "Trebam savjet o pripremi vozila za tehnički pregled.",
+              ],
+            ],
+          },
+          maintenance: {
+            title: "Vrijeme je za redovni servis",
+            service: "mechanics",
+            question: "Što biste željeli dogovoriti?",
+            description: "Želim dogovoriti redovni servis vozila.",
+            answers: [
+              ["Zamjenu ulja i filtara", "Zanima me zamjena ulja i filtara."],
+              [
+                "Servis prema planu održavanja",
+                "Želim servis prema planu održavanja svog vozila.",
+              ],
+              [
+                "Nisam siguran što je potrebno",
+                "Trebam savjet o potrebnom održavanju vozila.",
+              ],
+            ],
+          },
+          unsure: {
+            title: "Nisam siguran",
+            service: "other",
+            question: "Što vas je potaknulo da nam se javite?",
+            description: "Trebam pomoć pri odabiru usluge za svoje vozilo.",
+            answers: [
+              [
+                "Primijetio sam promjenu u radu",
+                "Primijetio sam promjenu u radu vozila koju ću opisati u upitu.",
+              ],
+              ["Želim preventivni pregled", "Želim provjeriti stanje vozila."],
+              [
+                "Nešto drugo / trebam savjet",
+                "Želio bih se posavjetovati sa servisom.",
+              ],
+            ],
+          },
+        },
+      },
       inquiry: {
         greeting: "Poštovani,",
         service: "zanima me usluga",
@@ -40,6 +110,86 @@
       copied: "Your enquiry has been copied.",
       copyUnavailable:
         "Automatic copying is unavailable. Use the Copy command to copy the selected text.",
+      guide: {
+        firstStep: "Step 1 of 2 · Choose your situation",
+        secondStep: "Step 2 of 2 · One more detail",
+        tooLong:
+          "Your existing message and selected details are too long together. Shorten the message in the enquiry form, then try again.",
+        situations: {
+          climate: {
+            title: "My air conditioning isn’t cooling well",
+            service: "air-conditioning",
+            question: "When do you notice the problem?",
+            description: "My car’s air conditioning isn’t cooling well.",
+            answers: [
+              ["All the time", "The problem occurs all the time."],
+              ["Occasionally", "The problem occurs occasionally."],
+              ["I’m not sure", "I’m not sure when the problem occurs."],
+            ],
+          },
+          inspection: {
+            title: "I’m preparing for a roadworthiness test",
+            service: "inspection",
+            question: "What would you like us to check?",
+            description:
+              "I’d like to prepare my car for its roadworthiness test.",
+            answers: [
+              [
+                "The car’s general condition",
+                "I’d like a general vehicle check.",
+              ],
+              [
+                "I’ve already noticed an issue",
+                "I’ve noticed an issue that I’ll describe in my enquiry.",
+              ],
+              [
+                "I need advice",
+                "I’d like advice on preparing my car for the test.",
+              ],
+            ],
+          },
+          maintenance: {
+            title: "It’s time for a routine service",
+            service: "mechanics",
+            question: "What would you like to arrange?",
+            description: "I’d like to arrange a routine service for my car.",
+            answers: [
+              [
+                "An oil and filter change",
+                "I’d like an oil and filter change.",
+              ],
+              [
+                "Scheduled maintenance",
+                "I’d like a service according to my car’s maintenance schedule.",
+              ],
+              [
+                "I’m not sure what’s needed",
+                "I’d like advice on the maintenance my car needs.",
+              ],
+            ],
+          },
+          unsure: {
+            title: "I’m not sure",
+            service: "other",
+            question: "What brings you here?",
+            description: "I’d like help choosing a service for my car.",
+            answers: [
+              [
+                "I’ve noticed a change in how it runs",
+                "I’ve noticed a change in how my car runs that I’ll describe in my enquiry.",
+              ],
+              [
+                "I’d like a preventive check",
+                "I’d like to check my car’s condition.",
+              ],
+              [
+                "Something else / I need advice",
+                "I’d like to discuss my car with the garage.",
+              ],
+            ],
+          },
+        },
+      },
       inquiry: {
         greeting: "Hello,",
         service: "I would like to enquire about",
@@ -142,6 +292,163 @@
     closeMenu();
     dialog.showModal();
     document.body.classList.add("dialog-open");
+  }
+
+  const guide = document.querySelector("#vodic");
+  const guideForm = document.querySelector("#guide-form");
+  if (guide && guideForm && bookingForm && bookingDialog) {
+    const choices = guide.querySelector("#guide-choices");
+    const details = guide.querySelector("#guide-details");
+    const progress = guide.querySelector("#guide-progress");
+    const selection = guide.querySelector("#guide-selection");
+    const question = guide.querySelector("#guide-question");
+    const answers = guide.querySelector("#guide-answers");
+    const preview = guide.querySelector("#guide-preview");
+    const summary = guide.querySelector("#guide-summary");
+    const error = guide.querySelector("#guide-error");
+    const reuse = guide.querySelector("#guide-reuse");
+    let activeSituation = null;
+    let selectedCard = null;
+    let lastGuideDescription = "";
+    let reuseMessage = "";
+
+    function resetReuseChoice() {
+      reuse.hidden = true;
+      reuse.disabled = true;
+      reuse.querySelectorAll("input").forEach((input) => {
+        input.checked = false;
+      });
+      reuseMessage = "";
+    }
+
+    bookingForm.addEventListener("reset", () => {
+      lastGuideDescription = "";
+      resetReuseChoice();
+    });
+
+    function getGuideDescription() {
+      const selected = guideForm.querySelector(
+        "input[name='guide-answer']:checked",
+      );
+      const answer = activeSituation?.answers[Number(selected?.value)];
+      return selected && answer
+        ? `${activeSituation.description}\n${answer[1]}`
+        : "";
+    }
+
+    choices.addEventListener("click", (event) => {
+      const card = event.target.closest("[data-guide-situation]");
+      const situation =
+        card && messages.guide.situations[card.dataset.guideSituation];
+      if (!situation) return;
+      activeSituation = situation;
+      selectedCard = card;
+      selection.textContent = situation.title;
+      question.textContent = situation.question;
+      answers.replaceChildren();
+      situation.answers.forEach(([labelText], index) => {
+        const label = document.createElement("label");
+        label.className = "guide-answer";
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = "guide-answer";
+        input.value = String(index);
+        input.required = true;
+        const text = document.createElement("span");
+        text.textContent = labelText;
+        label.append(input, text);
+        answers.append(label);
+      });
+      summary.textContent = "";
+      preview.hidden = true;
+      error.textContent = "";
+      resetReuseChoice();
+      choices.hidden = true;
+      details.hidden = false;
+      progress.textContent = messages.guide.secondStep;
+      question.focus();
+    });
+
+    guide.querySelector("#guide-back").addEventListener("click", () => {
+      details.hidden = true;
+      choices.hidden = false;
+      activeSituation = null;
+      guideForm.reset();
+      resetReuseChoice();
+      preview.hidden = true;
+      summary.textContent = "";
+      error.textContent = "";
+      progress.textContent = messages.guide.firstStep;
+      selectedCard?.focus();
+    });
+
+    guideForm.addEventListener("change", () => {
+      summary.textContent = getGuideDescription();
+      preview.hidden = !summary.textContent;
+      error.textContent = "";
+    });
+
+    guideForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!guideForm.reportValidity()) return;
+      const description = getGuideDescription();
+      if (!description) return;
+      const messageField = field("message");
+      const previousMessage = messageField.value;
+      const previousDescriptionEdited =
+        lastGuideDescription &&
+        previousMessage.trim() &&
+        !previousMessage.includes(lastGuideDescription);
+      // An edited earlier summary can contradict the new answers. Let its author choose.
+      if (
+        previousDescriptionEdited &&
+        (reuse.hidden || reuseMessage !== previousMessage)
+      ) {
+        resetReuseChoice();
+        reuse.hidden = false;
+        reuse.disabled = false;
+        reuseMessage = previousMessage;
+        guide.querySelector("#guide-reuse-title").focus();
+        return;
+      }
+      const reuseChoice = guideForm.querySelector(
+        "input[name='guide-reuse']:checked",
+      )?.value;
+      const message = previousDescriptionEdited
+        ? reuseChoice === "keep"
+          ? previousMessage
+          : description
+        : lastGuideDescription && previousMessage.includes(lastGuideDescription)
+          ? previousMessage.replace(lastGuideDescription, description)
+          : previousMessage.trim()
+            ? `${previousMessage}\n\n${description}`
+            : description;
+      if (
+        messageField.maxLength > 0 &&
+        message.length > messageField.maxLength
+      ) {
+        error.textContent = messages.guide.tooLong;
+        return;
+      }
+      const serviceField = field("service");
+      serviceField.value = activeSituation.service;
+      serviceField.setCustomValidity("");
+      messageField.value = message;
+      messageField.setCustomValidity("");
+      if (!previousDescriptionEdited || reuseChoice === "replace") {
+        lastGuideDescription = description;
+      }
+      showInquiryForm();
+      openDialog(bookingDialog);
+    });
+
+    guide.hidden = false;
+    document.querySelectorAll("[data-guide-link]").forEach((link) => {
+      link.hidden = false;
+    });
+    document.querySelectorAll("[data-guide-fallback]").forEach((link) => {
+      link.hidden = true;
+    });
   }
 
   document.addEventListener("click", (event) => {
